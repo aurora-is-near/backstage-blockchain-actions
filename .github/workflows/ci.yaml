@@ -22,5 +22,7 @@ jobs:
       - run: pnpm format-check
       - run: pnpm lint
       - run: pnpm test
+        env:
+          BACKSTAGE_URL: ${{ secrets.BACKSTAGE_URL }}
       - run: pnpm build
       - run: pnpm bundle
