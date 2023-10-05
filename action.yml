@@ -15,7 +15,7 @@ inputs:
     required: false
 
 outputs:
-  result:
+  output:
     description: "The output of the helper"
 
 runs:
