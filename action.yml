@@ -19,7 +19,7 @@ outputs:
     description: "The output of the helper"
 
 runs:
-  using: "node18"
+  using: "node16"
   main: "dist/index.js"
 
 branding:
