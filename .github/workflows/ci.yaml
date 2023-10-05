@@ -21,6 +21,9 @@ jobs:
         run: pnpm install
       - run: pnpm format-check
       - run: pnpm lint
+      - run: |
+          mkdir tmp
+          mkdir tmp/backstage
       - run: pnpm test
         env:
           BACKSTAGE_URL: ${{ secrets.BACKSTAGE_URL }}
