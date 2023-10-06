@@ -1,6 +1,6 @@
 import { backstageMetrics } from "../../src/helpers/backstage-metrics";
 
-jest.mock("@actions/core", () => ({ info: () => {}, error: () => {} }));
+jest.mock("@actions/core");
 
 describe("backstage-metrics", () => {
   it("generates metrics info from entities", async () => {

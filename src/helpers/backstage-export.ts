@@ -1,4 +1,4 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { sync } from "glob";
 import type { Entity } from "@backstage/catalog-model";
 import fs from "fs";

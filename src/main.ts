@@ -1,4 +1,4 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { camelCase, upperFirst } from "lodash";
 import { getActionInputs } from "./utils/get-action-inputs";
 

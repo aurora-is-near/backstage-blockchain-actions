@@ -1,4 +1,4 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { client, v2 } from "@datadog/datadog-api-client";
 import type { Entity } from "@backstage/catalog-model";
 
