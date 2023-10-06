@@ -1,6 +1,8 @@
 name: CD
 on:
-  push: [main]
+  push:
+    branches:
+      - main
   workflow_dispatch:
 env:
   NODE: 16
