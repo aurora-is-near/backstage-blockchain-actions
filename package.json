@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "format-check": "prettier --check .",
     "lint": "eslint src/**/*.ts test/**/*.ts",
-    "bundle": "pnpm clean && ncc build --source-map --license licenses.txt && cp action.yml dist"
+    "bundle": "pnpm clean && ncc build --source-map --license licenses.txt && cp action.yml dist",
+    "version": "pnpm bundle && git add dist && pnpm changeset version"
   },
   "keywords": [
     "backstage",
@@ -20,10 +21,11 @@
   "author": "Aurora Security <security@aurora.dev>",
   "license": "CC0-1.0",
   "devDependencies": {
+    "@changesets/cli": "^2.26.2",
     "@types/jest": "^29.5.5",
     "@types/js-yaml": "^4.0.6",
-    "@types/node": "^20.8.2",
     "@types/lodash": "^4.14.199",
+    "@types/node": "^20.8.2",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@vercel/ncc": "^0.38.0",
     "eslint": "^8.50.0",
