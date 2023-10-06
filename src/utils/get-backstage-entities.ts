@@ -1,4 +1,4 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { CatalogClient } from "@backstage/catalog-client";
 import type { Entity } from "@backstage/catalog-model";
 import { simpleGit } from "simple-git";

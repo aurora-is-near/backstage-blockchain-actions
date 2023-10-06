@@ -1,6 +1,6 @@
 import { backstageExport } from "../../src/helpers/backstage-export";
 
-jest.mock("@actions/core", () => ({ info: () => {}, error: () => {} }));
+jest.mock("@actions/core");
 
 describe("backstage-export", () => {
   it("generates multisig info from a template", async () => {

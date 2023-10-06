@@ -3,6 +3,7 @@
   "extends": ["plugin:github/recommended"],
   "parser": "@typescript-eslint/parser",
   "rules": {
+    "import/no-namespace": "off",
     "camelcase": "off",
     "i18n-text/no-en": "off"
   },
