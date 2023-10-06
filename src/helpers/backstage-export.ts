@@ -70,6 +70,7 @@ export const backstageExport = async ({
   }
 
   await commitAndPushChanges(output_path);
+  return true;
 };
 
 function reexportTemplate(

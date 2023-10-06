@@ -1,4 +1,4 @@
-import { pick } from "./pick";
+import { pick } from "../../src/core/pick";
 
 describe("pick function", () => {
   it("should pick top-level fields", () => {

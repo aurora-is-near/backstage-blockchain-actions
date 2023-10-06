@@ -1,6 +1,9 @@
 name: Backstage Actions
 description: "A suite of Backstage workflows"
 inputs:
+  helper:
+    description: "The helper workflow to invoke"
+    required: true
   backstage_url:
     description: "Backstage URL"
     required: false
