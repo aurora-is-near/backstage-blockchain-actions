@@ -396,7 +396,7 @@ function generateUnknownSignerMetrics(collector, backstageUrl) {
     });
     return series;
 }
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function generateUnverifiedContractsMetrics(collector, backstageUrl) {
     const unverifiedContracts = collector
         .getAllApis()
