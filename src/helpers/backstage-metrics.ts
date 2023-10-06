@@ -251,7 +251,7 @@ function generateUnknownSignerMetrics(
   return series;
 }
 
-// eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function generateUnverifiedContractsMetrics(
   collector: MultisigsCollector,
   backstageUrl: string,

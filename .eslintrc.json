@@ -1,7 +1,8 @@
 {
-  "plugins": ["jest", "@typescript-eslint"],
-  "extends": ["plugin:github/recommended"],
+  "root": true,
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "github", "jest"],
   "rules": {
     "import/no-namespace": "off",
     "camelcase": "off",

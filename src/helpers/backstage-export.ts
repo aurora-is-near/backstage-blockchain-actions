@@ -74,7 +74,7 @@ export const backstageExport = async ({
 };
 
 function reexportTemplate(
-  inputs: BackstageExport & { templatePath: string; templateData: {} },
+  inputs: BackstageExport & { templatePath: string; templateData: object },
 ) {
   const outputPath =
     inputs.output_path! +
