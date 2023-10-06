@@ -11,7 +11,8 @@
     "format-check": "prettier --check .",
     "lint": "eslint src/**/*.ts test/**/*.ts",
     "bundle": "pnpm clean && ncc build --source-map --license licenses.txt && cp action.yml dist",
-    "ci:version": "pnpm bundle && git add dist && pnpm changeset version"
+    "ci:version": "pnpm bundle && git add dist && pnpm changeset version",
+    "ci:publish": "pnpm changeset tag && git push --tags"
   },
   "keywords": [
     "backstage",
