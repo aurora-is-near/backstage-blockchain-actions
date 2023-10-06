@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "format-check": "prettier --check .",
     "lint": "eslint src/**/*.ts test/**/*.ts",
-    "bundle": "npm run clean && ncc build --source-map --license licenses.txt"
+    "bundle": "npm run clean && ncc build --source-map --license licenses.txt && cp action.yml dist"
   },
   "keywords": [
     "backstage",
@@ -20,13 +20,15 @@
   "author": "Aurora Security <security@aurora.dev>",
   "license": "CC0-1.0",
   "devDependencies": {
-    "@tsconfig/node18": "^18.2.2",
     "@types/jest": "^29.5.5",
     "@types/js-yaml": "^4.0.6",
     "@types/node": "^20.8.2",
+    "@types/lodash": "^4.14.199",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@vercel/ncc": "^0.38.0",
     "eslint": "^8.50.0",
+    "eslint-plugin-github": "^4.10.1",
+    "eslint-plugin-jest": "^27.4.2",
     "jest": "^29.7.0",
     "js-yaml": "^4.1.0",
     "prettier": "^3.0.3",
@@ -40,9 +42,6 @@
     "@backstage/catalog-model": "^1.4.2",
     "@backstage/types": "^1.1.1",
     "@datadog/datadog-api-client": "^1.17.0",
-    "@types/lodash": "^4.14.199",
-    "eslint-plugin-github": "^4.10.1",
-    "eslint-plugin-jest": "^27.4.2",
     "glob": "^10.3.10",
     "handlebars": "^4.7.8",
     "lodash": "^4.17.21",
