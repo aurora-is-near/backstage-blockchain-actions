@@ -31,6 +31,6 @@ jobs:
         uses: changesets/action@v1
         with:
           # this expects you to have a npm script called version that runs some logic and then calls `changeset version`.
-          version: pnpm version
+          version: pnpm ci:version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
