@@ -3,7 +3,7 @@ on:
   pull_request:
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted, light]
     strategy:
       matrix:
         node-version: [16]
