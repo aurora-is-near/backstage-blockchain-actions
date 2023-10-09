@@ -127,7 +127,7 @@ export class RbacCollector {
                 e.spec?.type &&
                 // filter out role-groups since they are modeled with
                 // the same fields as a blockchain address
-                e.spec.type.toString() !== 'role-group' &&
+                e.spec.type.toString() !== "role-group" &&
                 e.spec.address?.toString().toLowerCase() === m &&
                 e.spec.network === roleGroup.spec?.network &&
                 e.spec.networkType === roleGroup.spec?.networkType,
