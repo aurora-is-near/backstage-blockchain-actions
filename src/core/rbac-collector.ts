@@ -7,6 +7,7 @@ import {
   RELATION_HAS_PART,
 } from "@backstage/catalog-model";
 import type { Entity, EntityRelation } from "@backstage/catalog-model";
+import { JsonArray } from "@backstage/types";
 
 export class RbacCollector {
   systemComponents: SystemComponents[] = [];
@@ -107,23 +108,44 @@ export class RbacCollector {
       }));
   }
 
-  collectRoles(contract: Entity): Entity[] {
+  collectRoles(contract: Entity): RoleInfo[] {
     return contract
       .relations!.filter(
         (r) =>
           r.type === RELATION_DEPENDS_ON &&
           parseEntityRef(r.targetRef).kind === "api",
       )
-      .reduce<Entity[]>((acc, r) => {
+      .reduce<RoleInfo[]>((acc, r) => {
         const roleGroup = this.roleGroups.find(
           (e) => stringifyEntityRef(e) === r.targetRef,
         );
-        if (roleGroup) {
-          return [...acc, roleGroup];
+        if (roleGroup && roleGroup.spec && roleGroup.spec.members) {
+          const specMembers = roleGroup.spec.members as JsonArray;
+          const members = specMembers.reduce<MemberInfo[]>((accMembers, m) => {
+            const member = this.entities.find(
+              (e) =>
+                e.spec?.type &&
+                // filter out role-groups since they are modeled with
+                // the same fields as a blockchain address
+                e.spec.type.toString() !== 'role-group' &&
+                e.spec.address?.toString().toLowerCase() === m &&
+                e.spec.network === roleGroup.spec?.network &&
+                e.spec.networkType === roleGroup.spec?.networkType,
+            );
+            if (member) {
+              const ownerRef = parseEntityRef(member.spec?.owner as string);
+              const owner = this.entities.find(
+                (e) => e.metadata.name === ownerRef.name,
+              );
+              return [...accMembers, { member, owner }];
+            }
+            return accMembers;
+          }, []);
+          return [...acc, { role: roleGroup, members }];
         }
         return acc;
       }, [])
-      .sort((a, b) => a.metadata.name.localeCompare(b.metadata.name));
+      .sort((a, b) => a.role.metadata.name.localeCompare(b.role.metadata.name));
   }
 }
 
@@ -141,5 +163,15 @@ type ComponentContracts = {
 
 type ContractInfo = {
   entity: Entity;
-  roles: Entity[];
+  roles: RoleInfo[];
+};
+
+type RoleInfo = {
+  role: Entity;
+  members: MemberInfo[];
+};
+
+type MemberInfo = {
+  member: Entity;
+  owner?: Entity;
 };

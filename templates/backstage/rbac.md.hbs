@@ -33,13 +33,15 @@ periodically refreshed from the on-chain data. If you have any questions about t
                 ##### Roles
 
                 {{#each roles~}}
-                    {{#if metadata.title~}}
-                        ##### [{{metadata.title}}]({{backstageLink this}})
+                    {{#if role.metadata.title~}}
+                        ##### [{{role.metadata.title}}]({{backstageLink role}})
                     {{/if}}
 
-                    {{#each spec.members~}}
-                        - {{this}}
-                    {{/each}}
+                    {{#if members~}}
+                        {{#each members~}}
+                            - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{member.metadata.name}}]({{backstageLink member}}))
+                        {{/each}}
+                    {{/if}}
 
                 {{/each}}
             {{/if}}
