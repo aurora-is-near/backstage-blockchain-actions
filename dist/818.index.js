@@ -1,6 +1,6 @@
 "use strict";
-exports.id = 795;
-exports.ids = [795];
+exports.id = 818;
+exports.ids = [818];
 exports.modules = {
 
 /***/ 25498:
@@ -186,7 +186,7 @@ class MultisigsCollector {
 
 /***/ }),
 
-/***/ 27795:
+/***/ 26818:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 // ESM COMPAT FLAG
@@ -268,9 +268,6 @@ class FilteredCollector {
         this.srcEntities = entities;
         this.entities = this.filterEntities();
     }
-    normalizeEntities(list) {
-        return [...new Set(list)].sort((a, b) => a.localeCompare(b));
-    }
     filterSpec(spec) {
         if (!spec)
             return {};
@@ -290,6 +287,117 @@ class FilteredCollector {
                 spec: this.filterSpec(e.spec),
             };
         });
+    }
+}
+
+// EXTERNAL MODULE: ./node_modules/.pnpm/@backstage+catalog-model@1.4.2/node_modules/@backstage/catalog-model/dist/index.esm.js
+var index_esm = __webpack_require__(33631);
+;// CONCATENATED MODULE: ./src/core/rbac-collector.ts
+
+class RbacCollector {
+    constructor(entities) {
+        this.systemComponents = [];
+        this.entities = [];
+        this.contracts = [];
+        this.roleGroups = [];
+        this.entities = entities;
+        const apiEntities = this.entities.filter(index_esm/* isApiEntity */.$R);
+        this.contracts = apiEntities.filter((item) => { var _a; return ((_a = item.spec) === null || _a === void 0 ? void 0 : _a.type) === "contract-deployment"; });
+        this.roleGroups = apiEntities.filter((item) => { var _a; return ((_a = item.spec) === null || _a === void 0 ? void 0 : _a.type) === "role-group"; });
+        this.systemComponents = this.collectSystems();
+    }
+    normalizeEntities(list) {
+        return [...new Set(list)].sort((a, b) => a.localeCompare(b));
+    }
+    collectSystems() {
+        const systemRefs = this.normalizeEntities(this.contracts
+            .filter((c) => { var _a; return !!((_a = c.spec) === null || _a === void 0 ? void 0 : _a.system); })
+            .map((c) => c.spec.system));
+        return systemRefs
+            .reduce((acc, systemRef) => {
+            const system = this.entities.find((item) => (0,index_esm/* stringifyEntityRef */.eE)(item) === systemRef);
+            const components = this.collectComponents(system);
+            if (components.some((c) => c.contracts.length)) {
+                return [
+                    ...acc,
+                    {
+                        title: system.metadata.title || system.metadata.name,
+                        system,
+                        components,
+                    },
+                ];
+            }
+            return acc;
+        }, [])
+            .sort((a, b) => a.system.metadata.name.localeCompare(b.system.metadata.name));
+    }
+    collectComponents(system) {
+        const componentRefs = system.relations.filter((r) => r.type === index_esm/* RELATION_HAS_PART */.aS &&
+            (0,index_esm/* parseEntityRef */.of)(r.targetRef).kind === "component");
+        return componentRefs
+            .reduce((acc, componentRef) => {
+            const component = this.entities.find((item) => (0,index_esm/* stringifyEntityRef */.eE)(item) === componentRef.targetRef);
+            const contracts = this.collectContracts(componentRef);
+            if (contracts.length) {
+                return [
+                    ...acc,
+                    {
+                        title: component.metadata.title || component.metadata.name,
+                        component,
+                        contracts,
+                    },
+                ];
+            }
+            return acc;
+        }, [])
+            .sort((a, b) => a.component.metadata.name.localeCompare(b.component.metadata.name));
+    }
+    collectContracts(componentRef) {
+        return this.contracts
+            .filter((item) => {
+            var _a, _b;
+            return item.relations.some((r) => r.type === index_esm/* RELATION_API_PROVIDED_BY */.Zj &&
+                r.targetRef === componentRef.targetRef) &&
+                ((_a = item.metadata.tags) === null || _a === void 0 ? void 0 : _a.includes("rbac")) &&
+                ((_b = item.spec) === null || _b === void 0 ? void 0 : _b.lifecycle) === "production";
+        })
+            .map((entity) => ({
+            entity,
+            roles: this.collectRoles(entity),
+        }));
+    }
+    collectRoles(contract) {
+        return contract
+            .relations.filter((r) => r.type === index_esm/* RELATION_DEPENDS_ON */.nP &&
+            (0,index_esm/* parseEntityRef */.of)(r.targetRef).kind === "api")
+            .reduce((acc, r) => {
+            const roleGroup = this.roleGroups.find((e) => (0,index_esm/* stringifyEntityRef */.eE)(e) === r.targetRef);
+            if (roleGroup && roleGroup.spec && roleGroup.spec.members) {
+                const specMembers = roleGroup.spec.members;
+                const members = specMembers.reduce((accMembers, m) => {
+                    var _a;
+                    const member = this.entities.find((e) => {
+                        var _a, _b, _c, _d;
+                        return ((_a = e.spec) === null || _a === void 0 ? void 0 : _a.type) &&
+                            // filter out role-groups since they are modeled with
+                            // the same fields as a blockchain address
+                            e.spec.type.toString() !== "role-group" &&
+                            ((_b = e.spec.address) === null || _b === void 0 ? void 0 : _b.toString().toLowerCase()) === m &&
+                            e.spec.network === ((_c = roleGroup.spec) === null || _c === void 0 ? void 0 : _c.network) &&
+                            e.spec.networkType === ((_d = roleGroup.spec) === null || _d === void 0 ? void 0 : _d.networkType);
+                    });
+                    if (member) {
+                        const ownerRef = (0,index_esm/* parseEntityRef */.of)((_a = member.spec) === null || _a === void 0 ? void 0 : _a.owner);
+                        const owner = this.entities.find((e) => e.metadata.name === ownerRef.name);
+                        return [...accMembers, { member, owner }];
+                    }
+                    return accMembers;
+                }, []);
+                return [...acc, { role: roleGroup, members }];
+            }
+            return acc;
+        }, [])
+            .sort((a, b) => a.role.metadata.name.localeCompare(b.role.metadata.name));
     }
 }
 
@@ -313,6 +421,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
+
 class BackstageExport {
 }
 const backstageExport = ({ backstage_url, template_path, output_path, testing, }) => __awaiter(void 0, void 0, void 0, function* () {
@@ -322,10 +431,12 @@ const backstageExport = ({ backstage_url, template_path, output_path, testing, }
     const entities = yield (0,get_backstage_entities/* getBackstageEntities */.g)({ backstage_url });
     const multisigsCollector = new multisigs_collector/* MultisigsCollector */.d(entities);
     const filteredCollector = new FilteredCollector(entities);
+    const rbacCollector = new RbacCollector(entities);
     // console.log(JSON.stringify(multisigsCollector.systemComponents[0], null, 2));
     const changedFiles = (0,esm/* sync */.Z_)(`${template_path}**/*.hbs`).reduce((acc, templatePath) => {
         const templateData = {
             multisigSystemComponents: multisigsCollector.systemComponents,
+            contractSystemComponents: rbacCollector.systemComponents,
             filteredEntities: JSON.stringify(filteredCollector.entities, null, 2),
             testing,
         };
@@ -482,4 +593,4 @@ const getBackstageEntities = ({ backstage_url: backstageUrl, backstage_entities_
 
 };
 ;
-//# sourceMappingURL=795.index.js.map
+//# sourceMappingURL=818.index.js.map
