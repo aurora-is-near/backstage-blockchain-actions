@@ -29,10 +29,6 @@ export class FilteredCollector {
     this.entities = this.filterEntities();
   }
 
-  normalizeEntities(list: string[]) {
-    return [...new Set(list)].sort((a, b) => a.localeCompare(b));
-  }
-
   filterSpec(spec?: JsonObject) {
     if (!spec) return {};
     return pick(spec, ALLOWED_SPEC_FIELDS);

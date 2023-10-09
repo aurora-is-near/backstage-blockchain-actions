@@ -1,0 +1,56 @@
+# RBAC (Role Based Access Control)
+
+{{#if disclaimer}}
+    {{disclaimer}}
+{{/if}}
+
+This is a list of all known rbac-powered contracts used and managed by Aurora DAO and Aurora Labs. The information is stored in Backstage and
+periodically refreshed from the on-chain data. If you have any questions about the data, please contact the security team.
+
+{{#each contractSystemComponents~}}
+
+    ## [{{title}}]({{backstageLink system}})
+
+    {{#if system.metadata.description~}}
+        {{system.metadata.description}}
+    {{/if}}
+
+    {{#each components~}}
+        ### [{{component.metadata.name}}]({{backstageLink component}})
+
+        {{#if component.metadata.description~}}
+            {{component.metadata.description}}
+        {{/if}}
+
+        {{#each contracts~}}
+            #### [{{entity.metadata.title}}]({{backstageLink entity}})
+
+            {{#if entity.metadata.description~}}
+                {{entity.metadata.description}}
+            {{/if}}
+
+            {{#if roles~}}
+                ##### Roles
+
+                {{#each roles~}}
+                    {{#if metadata.title~}}
+                        ##### [{{metadata.title}}]({{backstageLink this}})
+                    {{/if}}
+
+                    {{#each spec.members~}}
+                        - {{this}}
+                    {{/each}}
+
+                {{/each}}
+            {{/if}}
+            {{#if entity.metadata.links~}}
+                ##### External Links
+                {{#each entity.metadata.links~}}
+                    - [{{title}}]({{url}})
+                {{/each}}
+            {{/if}}
+
+        {{/each}}
+    {{/each}}
+
+{{/each}}
