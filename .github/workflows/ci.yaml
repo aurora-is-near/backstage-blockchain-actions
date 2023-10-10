@@ -21,8 +21,9 @@ jobs:
         run: pnpm install
       - run: pnpm format-check
       - run: pnpm lint
-      - run: pnpm build
-      - run: |
+      - run: pnpm type-check
+      - name: Create output directories
+        run: |
           mkdir tmp
           mkdir tmp/backstage
       - run: pnpm test

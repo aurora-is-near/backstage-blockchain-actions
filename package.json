@@ -5,14 +5,15 @@
   "main": "src/main.ts",
   "scripts": {
     "test": "jest",
-    "build": "tsc",
-    "clean": "rm -rf build dist",
+    "type-check": "tsc",
+    "clean": "rm -rf dist",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
-    "lint": "eslint src/**/*.ts test/**/*.ts",
-    "bundle": "pnpm clean && ncc build --source-map --license licenses.txt && cp action.yml dist",
-    "ci:version": "pnpm bundle && git add dist && pnpm changeset version",
-    "ci:publish": "pnpm changeset tag && git push --tags"
+    "lint": "eslint .",
+    "build": "pnpm clean && ncc build --source-map --license licenses.txt && cp action.yml dist",
+    "ci:version": "node ./scripts/bump.js",
+    "ci:publish": "node ./scripts/release.js",
+    "pkg:version": "echo $npm_package_version"
   },
   "keywords": [
     "backstage",
@@ -22,6 +23,7 @@
   "author": "Aurora Security <security@aurora.dev>",
   "license": "CC0-1.0",
   "devDependencies": {
+    "@actions/exec": "^1.1.1",
     "@changesets/cli": "^2.26.2",
     "@types/jest": "^29.5.5",
     "@types/js-yaml": "^4.0.6",

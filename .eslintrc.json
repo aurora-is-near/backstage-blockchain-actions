@@ -8,6 +8,7 @@
     "camelcase": "off",
     "i18n-text/no-en": "off"
   },
+  "ignorePatterns": ["scripts", "dist"],
   "env": {
     "node": true,
     "es6": true,

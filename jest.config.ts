@@ -164,7 +164,6 @@ const config: Config = {
   // testPathIgnorePatterns: [
   //   "/node_modules/"
   // ],
-  testPathIgnorePatterns: ["/node_modules/", "/build/"],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   // testRegex: [],
