@@ -29,6 +29,7 @@ jobs:
 
       - name: Create Release Pull Request
         uses: changesets/action@v1
+        id: changesets
         with:
           # this expects you to have a npm script called version that runs some logic and then calls `changeset version`.
           version: pnpm ci:version
