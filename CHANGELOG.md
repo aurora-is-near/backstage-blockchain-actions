@@ -1,5 +1,12 @@
 # backstage-blockchain-actions
 
+## 1.0.4
+
+### Patch Changes
+
+- c091ffe: feat: add dynamic required fields
+- 07a9de5: feat: add backstage entities repo fallback
+
 ## 1.0.3
 
 ### Patch Changes
