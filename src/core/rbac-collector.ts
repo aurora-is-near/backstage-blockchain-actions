@@ -7,7 +7,7 @@ import {
   RELATION_HAS_PART,
 } from "@backstage/catalog-model";
 import type { Entity, EntityRelation } from "@backstage/catalog-model";
-import { JsonArray } from "@backstage/types";
+import type { JsonArray } from "@backstage/types";
 
 export class RbacCollector {
   systemComponents: SystemComponents[] = [];

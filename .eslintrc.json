@@ -1,17 +1,24 @@
 {
   "root": true,
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:github/typescript",
+    "prettier"
+  ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "github", "jest"],
-  "rules": {
-    "import/no-namespace": "off",
-    "camelcase": "off",
-    "i18n-text/no-en": "off"
-  },
+  "plugins": ["@typescript-eslint", "github"],
+  "rules": {},
   "ignorePatterns": ["scripts", "dist"],
+  "overrides": [
+    {
+      "files": ["test/**"],
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/recommended"]
+    }
+  ],
   "env": {
     "node": true,
-    "es6": true,
-    "jest/globals": true
+    "es2021": true
   }
 }
