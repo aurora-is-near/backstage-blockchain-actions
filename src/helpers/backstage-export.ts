@@ -13,8 +13,8 @@ import { getBackstageEntities } from "../utils/get-backstage-entities";
 export class BackstageExport {
   backstage_url?: string;
   backstage_entities_repo?: string;
-  template_path?: string;
-  output_path?: string;
+  template_path = "";
+  output_path = "";
   testing?: boolean;
 }
 
