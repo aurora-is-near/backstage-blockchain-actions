@@ -22,7 +22,10 @@ const output = "some output";
 describe("main", () => {
   it("should call module with correct inputs and set output", async () => {
     await run();
-    expect(getActionInputs).toHaveBeenCalledWith([]);
+    expect(getActionInputs).toHaveBeenCalledWith([
+      "template_path",
+      "output_path",
+    ]);
     expect(helperSpy).toHaveBeenCalledWith(otherInputs);
     expect(core.setOutput).toHaveBeenCalledWith("output", output);
   });
