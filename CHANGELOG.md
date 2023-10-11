@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.3
+
+### Patch Changes
+
+- 944ed06: ci: move to detached releases, cleanup build
+
 ## 1.0.2
 
 ### Patch Changes
