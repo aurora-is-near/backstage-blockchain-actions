@@ -8,6 +8,27 @@ interface GetBackstageEntities {
   backstage_entities_repo?: string;
 }
 
+export const getBackstageEntities = async ({
+  backstage_url: backstageUrl,
+  backstage_entities_repo: backstageEntitiesRepo,
+}: GetBackstageEntities) => {
+  if (backstageUrl) {
+    try {
+      return fetchBackstageEntitiesFromURL(backstageUrl);
+    } catch (err) {
+      /* empty */
+    }
+  }
+  // repo used as fallback to the URL in order to avoid unnecessary runtime
+  // dependency
+  if (backstageEntitiesRepo) {
+    return fetchBackstageEntitiesFromRepo(backstageEntitiesRepo);
+  }
+  throw new Error(
+    "Backstage URL or entities repo is required. Set BACKSTAGE_URL (github secret) or pass backstage_entities_repo argument to this action",
+  );
+};
+
 async function getFileContentFromRepo(
   repoUrl: string,
   filePath: string,
@@ -60,19 +81,3 @@ async function fetchBackstageEntitiesFromRepo(backstageEntitiesRepo: string) {
   );
   return JSON.parse(content) as Entity[];
 }
-
-export const getBackstageEntities = async ({
-  backstage_url: backstageUrl,
-  backstage_entities_repo: backstageEntitiesRepo,
-}: GetBackstageEntities) => {
-  // repo takes a priority over the URL in order to avoid unnecessary runtime
-  // dependency
-  if (backstageEntitiesRepo) {
-    return fetchBackstageEntitiesFromRepo(backstageEntitiesRepo);
-  } else if (backstageUrl) {
-    return fetchBackstageEntitiesFromURL(backstageUrl);
-  }
-  throw new Error(
-    "Backstage URL or entities repo is required. Set BACKSTAGE_URL (github secret) or pass backstage_entities_repo argument to this action",
-  );
-};
