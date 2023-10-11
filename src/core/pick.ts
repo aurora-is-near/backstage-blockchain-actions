@@ -39,7 +39,7 @@ function setNestedValue<T, K extends NestedKeys<T>>(
   }
 }
 
-export function pick<T>(obj: T, whitelist: NestedKeys<T>[]): Partial<T> {
+export function pick<T>(obj: T, whitelist: Array<NestedKeys<T>>): Partial<T> {
   return whitelist.reduce((newObj, key) => {
     const value = getNestedValue(obj, key);
     if (value !== undefined) {
