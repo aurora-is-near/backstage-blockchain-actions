@@ -12,6 +12,7 @@ import { getBackstageEntities } from "../utils/get-backstage-entities";
 
 export class BackstageExport {
   backstage_url?: string;
+  backstage_entities_repo?: string;
   template_path?: string;
   output_path?: string;
   testing?: boolean;
@@ -19,6 +20,7 @@ export class BackstageExport {
 
 export const backstageExport = async ({
   backstage_url,
+  backstage_entities_repo,
   template_path,
   output_path,
   testing,
@@ -29,14 +31,17 @@ export const backstageExport = async ({
     );
   }
 
-  const entities = await getBackstageEntities({ backstage_url });
+  const entities = await getBackstageEntities({
+    backstage_url,
+    backstage_entities_repo,
+  });
 
   const multisigsCollector = new MultisigsCollector(entities);
   const filteredCollector = new FilteredCollector(entities);
   const rbacCollector = new RbacCollector(entities);
 
   // console.log(JSON.stringify(multisigsCollector.systemComponents[0], null, 2));
-  const changedFiles = sync(`${template_path}**/*.hbs`).reduce(
+  const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
     (acc, templatePath) => {
       const templateData = {
         multisigSystemComponents: multisigsCollector.systemComponents,
@@ -59,7 +64,7 @@ export const backstageExport = async ({
 
       return acc;
     },
-    [] as string[],
+    [],
   );
 
   if (testing) {
