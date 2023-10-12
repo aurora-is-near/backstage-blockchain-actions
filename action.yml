@@ -5,7 +5,7 @@ inputs:
     description: "The helper workflow to invoke"
     required: true
   backstage_url:
-    description: "Backstage URL"
+    description: "Backstage URL - url of Backstage backend"
     required: false
   backstage_entities_repo:
     description: "Backstage Entities repository - fallback for the URL endpoint"

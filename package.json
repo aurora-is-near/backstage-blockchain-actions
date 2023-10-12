@@ -20,8 +20,10 @@
   },
   "keywords": [
     "backstage",
+    "blockchain",
     "actions",
-    "github"
+    "github",
+    "datadog"
   ],
   "author": "Aurora Security <security@aurora.dev>",
   "license": "CC0-1.0",
