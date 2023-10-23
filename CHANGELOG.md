@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.5
+
+### Patch Changes
+
+- fd997c7: feat: add access key export
+
 ## 1.0.4
 
 ### Patch Changes
