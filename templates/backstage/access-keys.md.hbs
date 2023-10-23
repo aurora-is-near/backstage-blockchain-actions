@@ -1,0 +1,50 @@
+# Contract with Access Keys
+
+{{#if disclaimer}}
+    {{disclaimer}}
+{{/if}}
+
+This is a list of all known multisigs used and managed by Aurora DAO and Aurora Labs. The information is stored in Backstage and
+periodically refreshed from the on-chain data. If you have any questions about the data, please contact the security team.
+
+{{#each accessKeySystemComponents~}}
+
+    ## [{{title}}]({{backstageLink system}})
+
+    {{#if system.metadata.description~}}
+        {{system.metadata.description}}
+    {{/if}}
+
+    {{#each components~}}
+        ### [{{title}}]({{backstageLink component}})
+
+        {{#if component.metadata.description~}}
+            {{component.metadata.description}}
+        {{/if}}
+
+        {{#each contracts~}}
+            #### [{{entity.metadata.title}}]({{backstageLink entity}})
+
+            {{#if entity.metadata.description~}}
+                {{entity.metadata.description}}
+            {{/if}}
+
+            {{#if keys~}}
+                ##### Keys
+
+                {{#each keys~}}
+                    - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}}))
+                {{/each}}
+            {{/if}}
+
+            {{#if entity.metadata.links~}}
+                ##### External Links
+                {{#each entity.metadata.links~}}
+                    - [{{title}}]({{url}})
+                {{/each}}
+            {{/if}}
+
+        {{/each}}
+    {{/each}}
+
+{{/each}}
