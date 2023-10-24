@@ -26,6 +26,7 @@ jobs:
         run: |
           mkdir tmp
           mkdir tmp/backstage
+          mkdir tmp/backstage/scoped
       - run: pnpm test
         env:
           BACKSTAGE_URL: ${{ secrets.BACKSTAGE_URL }}
