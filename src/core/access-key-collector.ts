@@ -10,12 +10,12 @@ import {
 import type { Entity, EntityRelation } from "@backstage/catalog-model";
 
 export class AccessKeyCollector {
-  systemComponents: SystemComponents[] = [];
+  systemComponents: SystemInfo[] = [];
   private entities: Entity[] = [];
   private contracts: Entity[] = [];
   private accessKeys: Entity[] = [];
 
-  constructor(entities: Entity[]) {
+  constructor(entities: Entity[], opts: CollectorOptions = {}) {
     this.entities = entities;
     const apiEntities = this.entities.filter(isApiEntity);
     const resourceEntities = this.entities.filter(isResourceEntity);
@@ -25,24 +25,28 @@ export class AccessKeyCollector {
     this.accessKeys = resourceEntities.filter(
       (item) => item.spec?.type === "access-key",
     );
-    this.systemComponents = this.collectSystems();
+    this.systemComponents = this.collectSystems(opts);
   }
 
   normalizeEntities(list: string[]) {
     return [...new Set(list)].sort((a, b) => a.localeCompare(b));
   }
 
-  collectSystems(): SystemComponents[] {
+  collectSystems(opts: CollectorOptions): SystemInfo[] {
     const systemRefs = this.normalizeEntities(
       this.contracts
         .filter((c) => !!c.spec?.system)
         .map((c) => c.spec!.system as string),
     );
     return systemRefs
-      .reduce<SystemComponents[]>((acc, systemRef) => {
+      .reduce<SystemInfo[]>((acc, systemRef) => {
         const system = this.entities.find(
           (item) => stringifyEntityRef(item) === systemRef,
         )!;
+        if (opts.scope && system.spec?.owner !== opts.scope) {
+          return acc;
+        }
+
         const components = this.collectComponents(system);
 
         if (components.some((c) => c.contracts.length)) {
@@ -62,14 +66,14 @@ export class AccessKeyCollector {
       );
   }
 
-  collectComponents(system: Entity): ComponentContracts[] {
+  collectComponents(system: Entity): ComponentInfo[] {
     const componentRefs = system.relations!.filter(
       (r) =>
         r.type === RELATION_HAS_PART &&
         parseEntityRef(r.targetRef).kind === "component",
     );
     return componentRefs
-      .reduce<ComponentContracts[]>((acc, componentRef) => {
+      .reduce<ComponentInfo[]>((acc, componentRef) => {
         const component = this.entities.find(
           (item) => stringifyEntityRef(item) === componentRef.targetRef,
         )!;
@@ -139,13 +143,17 @@ export class AccessKeyCollector {
   }
 }
 
-type SystemComponents = {
-  title: string;
-  system: Entity;
-  components: ComponentContracts[];
+type CollectorOptions = {
+  scope?: string;
 };
 
-type ComponentContracts = {
+type SystemInfo = {
+  title: string;
+  system: Entity;
+  components: ComponentInfo[];
+};
+
+type ComponentInfo = {
   title: string;
   component: Entity;
   contracts: ContractInfo[];

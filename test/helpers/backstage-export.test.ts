@@ -8,6 +8,7 @@ describe("backstage-export", () => {
       backstage_url: process.env.BACKSTAGE_URL,
       template_path: "templates/backstage",
       output_path: "tmp/backstage",
+      scope: "bridge-team",
       testing: true,
     });
     expect(result).toBeTruthy();

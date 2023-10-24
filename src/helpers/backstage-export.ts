@@ -16,6 +16,7 @@ export class BackstageExport {
   backstage_entities_repo?: string;
   template_path = "";
   output_path = "";
+  scope?: string;
   testing?: boolean;
 }
 
@@ -24,6 +25,7 @@ export const backstageExport = async ({
   backstage_entities_repo,
   template_path,
   output_path,
+  scope,
   testing,
 }: BackstageExport) => {
   if (!template_path || !output_path) {
@@ -39,8 +41,12 @@ export const backstageExport = async ({
 
   const multisigsCollector = new MultisigsCollector(entities);
   const filteredCollector = new FilteredCollector(entities);
-  const rbacCollector = new RbacCollector(entities);
-  const accessKeyCollector = new AccessKeyCollector(entities);
+  const rbacCollector = new RbacCollector(entities, {
+    scope,
+  });
+  const accessKeyCollector = new AccessKeyCollector(entities, {
+    scope,
+  });
 
   // console.log(JSON.stringify(multisigsCollector.systemComponents[0], null, 2));
   const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
