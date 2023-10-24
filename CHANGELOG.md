@@ -1,5 +1,12 @@
 # backstage-blockchain-actions
 
+## 1.0.6
+
+### Patch Changes
+
+- 0c16fa2: refactor: pick prototype pollution
+- 459800a: feat: add scoped exports
+
 ## 1.0.5
 
 ### Patch Changes
