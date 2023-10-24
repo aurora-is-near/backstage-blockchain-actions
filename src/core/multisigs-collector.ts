@@ -44,7 +44,7 @@ export class MultisigsCollector {
   private contracts: Entity[] = [];
   private accessKeys: Entity[] = [];
 
-  constructor(entities: Entity[]) {
+  constructor(entities: Entity[], opts: CollectorOptions = {}) {
     this.entities = entities;
     this.apiEntities = this.entities.filter(isApiEntity);
     this.resourceEntities = this.entities.filter(isResourceEntity);
@@ -57,30 +57,36 @@ export class MultisigsCollector {
     this.accessKeys = this.resourceEntities.filter(
       (item) => item.spec?.type === "access-key",
     );
-    this.systemComponents = this.collectSystems();
+    this.systemComponents = this.collectSystems(opts);
   }
 
   normalizeEntities(list: string[]) {
     return [...new Set(list)].sort((a, b) => a.localeCompare(b));
   }
 
-  collectSystems() {
+  collectSystems(opts: CollectorOptions) {
     const systemRefs = this.normalizeEntities(
       this.multisigs.map((item) => item.spec!.system! as string),
     );
     return systemRefs
-      .map((systemRef) => {
+      .reduce<SystemComponents[]>((acc, systemRef) => {
         const system = this.entities.find(
           (item) => stringifyEntityRef(item) === systemRef,
         )!;
+        if (opts.scope && system.spec?.owner !== opts.scope) {
+          return acc;
+        }
         const components = this.collectComponents(system);
 
-        return {
-          title: system.metadata.title || system.metadata.name,
-          system,
-          components,
-        };
-      })
+        return [
+          ...acc,
+          {
+            title: system.metadata.title || system.metadata.name,
+            system,
+            components,
+          },
+        ];
+      }, [])
       .sort((a, b) =>
         a.system.metadata.name.localeCompare(b.system.metadata.name),
       );
@@ -295,3 +301,7 @@ export class MultisigsCollector {
     return entity !== undefined;
   }
 }
+
+type CollectorOptions = {
+  scope?: string;
+};

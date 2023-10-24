@@ -24,9 +24,9 @@ export class FilteredCollector {
   entities: Entity[];
   private srcEntities: Entity[];
 
-  constructor(entities: Entity[]) {
+  constructor(entities: Entity[], opts: CollectorOptions = {}) {
     this.srcEntities = entities;
-    this.entities = this.filterEntities();
+    this.entities = this.filterEntities(opts);
   }
 
   filterSpec(spec?: JsonObject) {
@@ -38,8 +38,11 @@ export class FilteredCollector {
     return pick(metadata, ALLOWED_METADATA_FIELDS);
   }
 
-  filterEntities() {
-    return this.srcEntities
+  filterEntities(opts: CollectorOptions) {
+    const source = opts.scope
+      ? this.srcEntities.filter((e) => e.spec?.owner === opts.scope)
+      : this.srcEntities;
+    return source
       .filter((e) => ALLOWED_KINDS.includes(e.kind))
       .map((e) => {
         return {
@@ -51,3 +54,7 @@ export class FilteredCollector {
       });
   }
 }
+
+type CollectorOptions = {
+  scope?: string;
+};

@@ -13,6 +13,7 @@ This action is for [Blockchainradar](https://github.com/aurora-is-near/backstage
 - helper - The helper workflow to invoke.
 - backstage_url - The backstage url to pull entities from.
 - backstage_entities_repo - The repo to use as fallback if url is unavailable.
+- scope - The scope name (usually a Group name) to delimit exported entities by ownership.
 - template_path - The handlebars templates folder path used for exporting.
 - output_path - The output folder path used for compiled templates.
 
@@ -45,4 +46,17 @@ jobs:
           backstage_url: https://example.com
           template_path: templates/backstage
           output_path: .
+  scoped-export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: aurora-is-near/backstage-blockchain-actions@v1
+        id: export
+        with:
+          helper: backstage-export
+          backstage_url: https://example.com
+          template_path: templates/backstage
+          scope: <group-or-user-name>
+          output_path: ./scoped/
 ```

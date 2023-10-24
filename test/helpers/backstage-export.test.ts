@@ -11,5 +11,15 @@ describe("backstage-export", () => {
       testing: true,
     });
     expect(result).toBeTruthy();
-  });
+  }, 10000);
+  it("generates reports with scoped ownership", async () => {
+    const result = await backstageExport({
+      backstage_url: process.env.BACKSTAGE_URL,
+      template_path: "templates/backstage",
+      output_path: "tmp/backstage/scoped",
+      scope: "bridge-team",
+      testing: true,
+    });
+    expect(result).toBeTruthy();
+  }, 10000);
 });
