@@ -39,14 +39,10 @@ export const backstageExport = async ({
     backstage_entities_repo,
   });
 
-  const multisigsCollector = new MultisigsCollector(entities);
-  const filteredCollector = new FilteredCollector(entities);
-  const rbacCollector = new RbacCollector(entities, {
-    scope,
-  });
-  const accessKeyCollector = new AccessKeyCollector(entities, {
-    scope,
-  });
+  const multisigsCollector = new MultisigsCollector(entities, { scope });
+  const filteredCollector = new FilteredCollector(entities, { scope });
+  const rbacCollector = new RbacCollector(entities, { scope });
+  const accessKeyCollector = new AccessKeyCollector(entities, { scope });
 
   // console.log(JSON.stringify(multisigsCollector.systemComponents[0], null, 2));
   const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
