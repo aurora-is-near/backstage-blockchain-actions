@@ -10,6 +10,8 @@ inputs:
   backstage_entities_repo:
     description: "Backstage Entities repository - fallback for the URL endpoint"
     required: false
+  scope:
+    description: "Group or User entity name to filter by ownership of entities"
   template_path:
     description: "Handlebars Template Path"
     required: false
