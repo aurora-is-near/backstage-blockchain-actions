@@ -1,0 +1,17 @@
+# Unknown Entities
+
+{{#each unknown~}}
+    ### [{{title}}]({{backstageLink entity}})
+
+    {{#if entity.metadata.description~}}
+        {{entity.metadata.description}}
+    {{/if}}
+
+    {{#if entity.metadata.links~}}
+        ##### External Links
+        {{#each entity.metadata.links~}}
+            - [{{title}}]({{url}})
+        {{/each}}
+    {{/if}}
+
+{{/each}}
