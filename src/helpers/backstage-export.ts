@@ -9,6 +9,7 @@ import { MultisigsCollector } from "../core/multisigs-collector";
 import { FilteredCollector } from "../core/filtered-collector";
 import { RbacCollector } from "../core/rbac-collector";
 import { AccessKeyCollector } from "../core/access-key-collector";
+import { UnknownCollector } from "../core/unknown-collector";
 import { getBackstageEntities } from "../utils/get-backstage-entities";
 
 export class BackstageExport {
@@ -44,6 +45,9 @@ export const backstageExport = async ({
   const rbacCollector = new RbacCollector(entities, { scope });
   const accessKeyCollector = new AccessKeyCollector(entities, { scope });
 
+  const unknownCollector = new UnknownCollector(entities);
+  const unknownEntities = unknownCollector.collectEntities({ scope });
+
   // console.log(JSON.stringify(multisigsCollector.systemComponents[0], null, 2));
   const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
     (acc, templatePath) => {
@@ -51,6 +55,7 @@ export const backstageExport = async ({
         multisigSystemComponents: multisigsCollector.systemComponents,
         contractSystemComponents: rbacCollector.systemComponents,
         accessKeySystemComponents: accessKeyCollector.systemComponents,
+        unknown: unknownEntities,
         filteredEntities: JSON.stringify(filteredCollector.entities, null, 2),
         testing,
       };
