@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.7
+
+### Patch Changes
+
+- c4a0fd1: feat: add unknown reports
+
 ## 1.0.6
 
 ### Patch Changes
