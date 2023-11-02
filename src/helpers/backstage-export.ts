@@ -46,16 +46,43 @@ export const backstageExport = async ({
   const accessKeyCollector = new AccessKeyCollector(entities, { scope });
 
   const unknownCollector = new UnknownCollector(entities);
-  const unknownEntities = unknownCollector.collectEntities({ scope });
+  const unknownSystemComponents = unknownCollector.collectEntities({ scope });
+  // for (const system of unknownSystemComponents) {
+  //   for (const component of system.components) {
+  //     console.log("component:", component.component.metadata.name);
+  //     if (component.multisigs) {
+  //       for (const multisig of component.multisigs) {
+  //         console.log("multisig:", multisig.entity.metadata.name);
+  //         console.log("signers:", multisig.signers.length);
+  //       }
+  //     }
+  //     if (component.contracts) {
+  //       for (const contract of component.contracts) {
+  //         console.log("contract:", contract.entity.metadata.name);
+  //         console.log("keys:", contract?.keys?.length);
+  //         if (contract.keys) {
+  //           for (const key of contract.keys) {
+  //             console.log(key);
+  //           }
+  //         }
+  //         console.log("roles:", contract?.roles?.length);
+  //         if (contract.roles) {
+  //           for (const role of contract.roles) {
+  //             console.log(role);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
-  // console.log(JSON.stringify(multisigsCollector.systemComponents[0], null, 2));
   const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
     (acc, templatePath) => {
       const templateData = {
         multisigSystemComponents: multisigsCollector.systemComponents,
         contractSystemComponents: rbacCollector.systemComponents,
         accessKeySystemComponents: accessKeyCollector.systemComponents,
-        unknown: unknownEntities,
+        unknownSystemComponents,
         filteredEntities: JSON.stringify(filteredCollector.entities, null, 2),
         testing,
       };
