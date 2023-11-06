@@ -1,17 +1,92 @@
 # Unknown Entities
 
-{{#each unknown~}}
-    ### [{{title}}]({{backstageLink entity}})
+{{#each unknownSystemComponents}}
 
-    {{#if entity.metadata.description~}}
-        {{entity.metadata.description}}
-    {{/if}}
+## [{{title}}]({{backstageLink system}})
 
-    {{#if entity.metadata.links~}}
-        ##### External Links
-        {{#each entity.metadata.links~}}
-            - [{{title}}]({{url}})
-        {{/each}}
-    {{/if}}
+{{#if system.metadata.description}}
+{{system.metadata.description}}
+{{/if}}
 
+{{#each components~}}
+### [{{title}}]({{backstageLink component}})
+
+{{#if component.metadata.description}}
+{{component.metadata.description}}
+
+{{/if}}
+
+{{#if contracts}}
+{{#each contracts}}
+#### [{{entity.metadata.title}}]({{backstageLink entity}})
+
+{{#if entity.metadata.description}}
+{{entity.metadata.description}}
+
+{{/if}}
+
+{{#if keys}}
+##### Access Keys
+
+{{#each keys}}
+- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}}))
+{{/each}}
+{{/if}}
+
+{{#if roles}}
+##### Role Groups
+
+{{#each roles}}
+{{#if role.metadata.title}}
+##### [{{role.metadata.title}}]({{backstageLink role}})
+
+{{/if}}
+{{#if members}}
+##### Members
+
+{{#each members}}
+- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{member.metadata.title}}]({{backstageLink member}}))
+{{/each}}
+
+{{/if}}
+{{/each}}
+{{/if}}
+
+{{#if entity.metadata.links}}
+##### External Links
+
+{{#each entity.metadata.links}}
+- [{{title}}]({{url}})
+{{/each}}
+{{/if}}
+
+{{/each}}
+{{/if}}
+
+{{#if multisigs}}
+{{#each multisigs}}
+#### [{{entity.metadata.title}}]({{backstageLink entity}})
+
+{{#if entity.metadata.description}}
+{{entity.metadata.description}}
+
+{{/if}}
+{{#if signers}}
+##### Signers
+
+{{#each signers}}
+- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{signer.metadata.name}}]({{backstageLink signer}}))
+{{/each}}
+{{/if}}
+{{#if entity.metadata.links}}
+##### External Links
+
+{{#each entity.metadata.links}}
+- [{{title}}]({{url}})
+{{/each}}
+{{/if}}
+{{/each}}
+{{/if}}
+
+{{/each}}
 {{/each}}
