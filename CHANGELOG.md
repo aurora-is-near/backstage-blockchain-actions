@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.8
+
+### Patch Changes
+
+- a2bc856: refactor: make unknown reports using composition of collectors
+
 ## 1.0.7
 
 ### Patch Changes
