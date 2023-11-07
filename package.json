@@ -1,6 +1,6 @@
 {
   "name": "backstage-blockchain-actions",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Backstage workflows for Github Actions",
   "main": "src/main.ts",
   "exports": {

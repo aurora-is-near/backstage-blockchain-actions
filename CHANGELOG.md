@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.9
+
+### Patch Changes
+
+- 4662506: refactor: abstract common behavior into base collector along with types
+
 ## 1.0.8
 
 ### Patch Changes
