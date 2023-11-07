@@ -1,5 +1,4 @@
 import {
-  isApiEntity,
   stringifyEntityRef,
   parseEntityRef,
   RELATION_API_PROVIDED_BY,
@@ -8,61 +7,37 @@ import {
 } from "@backstage/catalog-model";
 import type { Entity, EntityRelation } from "@backstage/catalog-model";
 import type { JsonArray } from "@backstage/types";
+import { BaseCollector } from "./base-collector";
+import {
+  CollectorOptions,
+  ComponentInfo,
+  ContractInfo,
+  MemberInfo,
+  RoleInfo,
+  SystemInfo,
+} from "../types";
 
-export class RbacCollector {
-  systemComponents: SystemInfo[] = [];
-  private entities: Entity[] = [];
-  private contracts: Entity[] = [];
-  private roleGroups: Entity[] = [];
-
-  constructor(entities: Entity[], opts: CollectorOptions = {}) {
-    this.entities = entities;
-    const apiEntities = this.entities.filter(isApiEntity);
-    this.contracts = apiEntities.filter(
-      (item) => item.spec?.type === "contract-deployment",
-    );
-    this.roleGroups = apiEntities.filter(
-      (item) => item.spec?.type === "role-group",
-    );
-    this.systemComponents = this.collectSystems(opts);
-  }
-
-  normalizeEntities(list: string[]) {
-    return [...new Set(list)].sort((a, b) => a.localeCompare(b));
-  }
-
+export class RbacCollector extends BaseCollector {
   collectSystems(opts: CollectorOptions): SystemInfo[] {
-    const systemRefs = this.normalizeEntities(
-      this.contracts
-        .filter((c) => !!c.spec?.system)
-        .map((c) => c.spec!.system as string),
-    );
-    return systemRefs
-      .reduce<SystemInfo[]>((acc, systemRef) => {
-        const system = this.entities.find(
-          (item) => stringifyEntityRef(item) === systemRef,
-        )!;
-        if (opts.scope && system.spec?.owner !== opts.scope) {
-          return acc;
-        }
-
-        const components = this.collectComponents(system);
-
-        if (components.some((c) => c.contracts.length)) {
-          return [
-            ...acc,
-            {
-              title: system.metadata.title || system.metadata.name,
-              system,
-              components,
-            },
-          ];
-        }
+    return this.getSystemEntities().reduce<SystemInfo[]>((acc, system) => {
+      if (opts.scope && system.spec?.owner !== opts.scope) {
         return acc;
-      }, [])
-      .sort((a, b) =>
-        a.system.metadata.name.localeCompare(b.system.metadata.name),
-      );
+      }
+
+      const components = this.collectComponents(system);
+
+      if (components.some((c) => c.contracts?.length)) {
+        return [
+          ...acc,
+          {
+            title: system.metadata.title || system.metadata.name,
+            system,
+            components,
+          },
+        ];
+      }
+      return acc;
+    }, []);
   }
 
   collectComponents(system: Entity): ComponentInfo[] {
@@ -73,9 +48,7 @@ export class RbacCollector {
     );
     return componentRefs
       .reduce<ComponentInfo[]>((acc, componentRef) => {
-        const component = this.entities.find(
-          (item) => stringifyEntityRef(item) === componentRef.targetRef,
-        )!;
+        const component = this.entityCatalog[componentRef.targetRef];
         const contracts = this.collectContracts(componentRef);
         if (contracts.length) {
           return [
@@ -95,16 +68,17 @@ export class RbacCollector {
   }
 
   collectContracts(componentRef: EntityRelation): ContractInfo[] {
-    return this.contracts
+    return this.getApiEntities()
       .filter(
         (item) =>
+          item.spec?.type === "contract-deployment" &&
+          item.spec.lifecycle === "production" &&
+          item.metadata.tags?.includes("rbac") &&
           item.relations!.some(
             (r) =>
               r.type === RELATION_API_PROVIDED_BY &&
               r.targetRef === componentRef.targetRef,
-          ) &&
-          item.metadata.tags?.includes("rbac") &&
-          item.spec?.lifecycle === "production",
+          ),
       )
       .map((entity) => ({
         entity,
@@ -120,27 +94,23 @@ export class RbacCollector {
           parseEntityRef(r.targetRef).kind === "api",
       )
       .reduce<RoleInfo[]>((acc, r) => {
-        const roleGroup = this.roleGroups.find(
-          (e) => stringifyEntityRef(e) === r.targetRef,
-        );
+        const roleGroup = this.entityCatalog[r.targetRef];
         if (roleGroup && roleGroup.spec && roleGroup.spec.members) {
           const specMembers = roleGroup.spec.members as JsonArray;
           const members = specMembers.reduce<MemberInfo[]>((accMembers, m) => {
             const member = this.entities.find(
               (e) =>
-                e.spec?.type &&
+                e.spec &&
                 // filter out role-groups since they are modeled with
                 // the same fields as a blockchain address
-                e.spec.type.toString() !== "role-group" &&
+                e.spec.type !== "role-group" &&
                 e.spec.address?.toString().toLowerCase() === m &&
                 e.spec.network === roleGroup.spec?.network &&
                 e.spec.networkType === roleGroup.spec?.networkType,
             );
             if (member) {
               const ownerRef = parseEntityRef(member.spec?.owner as string);
-              const owner = this.entities.find(
-                (e) => e.metadata.name === ownerRef.name,
-              );
+              const owner = this.entityCatalog[stringifyEntityRef(ownerRef)];
               return [...accMembers, { member, owner }];
             }
             return accMembers;
@@ -152,34 +122,3 @@ export class RbacCollector {
       .sort((a, b) => a.role.metadata.name.localeCompare(b.role.metadata.name));
   }
 }
-
-type CollectorOptions = {
-  scope?: string;
-};
-
-type SystemInfo = {
-  title: string;
-  system: Entity;
-  components: ComponentInfo[];
-};
-
-type ComponentInfo = {
-  title: string;
-  component: Entity;
-  contracts: ContractInfo[];
-};
-
-type ContractInfo = {
-  entity: Entity;
-  roles: RoleInfo[];
-};
-
-type RoleInfo = {
-  role: Entity;
-  members: MemberInfo[];
-};
-
-type MemberInfo = {
-  member: Entity;
-  owner?: Entity;
-};

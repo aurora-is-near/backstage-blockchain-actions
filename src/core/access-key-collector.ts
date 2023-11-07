@@ -1,69 +1,41 @@
 import {
-  isApiEntity,
-  isResourceEntity,
-  stringifyEntityRef,
   parseEntityRef,
   RELATION_API_CONSUMED_BY,
   RELATION_API_PROVIDED_BY,
   RELATION_HAS_PART,
+  stringifyEntityRef,
 } from "@backstage/catalog-model";
 import type { Entity, EntityRelation } from "@backstage/catalog-model";
+import { BaseCollector } from "./base-collector";
+import {
+  CollectorOptions,
+  ComponentInfo,
+  ContractInfo,
+  KeyInfo,
+  SystemInfo,
+} from "../types";
 
-export class AccessKeyCollector {
-  systemComponents: SystemInfo[] = [];
-  private entities: Entity[] = [];
-  private contracts: Entity[] = [];
-  private accessKeys: Entity[] = [];
-
-  constructor(entities: Entity[], opts: CollectorOptions = {}) {
-    this.entities = entities;
-    const apiEntities = this.entities.filter(isApiEntity);
-    const resourceEntities = this.entities.filter(isResourceEntity);
-    this.contracts = apiEntities.filter(
-      (item) => item.spec?.type === "contract-deployment",
-    );
-    this.accessKeys = resourceEntities.filter(
-      (item) => item.spec?.type === "access-key",
-    );
-    this.systemComponents = this.collectSystems(opts);
-  }
-
-  normalizeEntities(list: string[]) {
-    return [...new Set(list)].sort((a, b) => a.localeCompare(b));
-  }
-
+export class AccessKeyCollector extends BaseCollector {
   collectSystems(opts: CollectorOptions): SystemInfo[] {
-    const systemRefs = this.normalizeEntities(
-      this.contracts
-        .filter((c) => !!c.spec?.system)
-        .map((c) => c.spec!.system as string),
-    );
-    return systemRefs
-      .reduce<SystemInfo[]>((acc, systemRef) => {
-        const system = this.entities.find(
-          (item) => stringifyEntityRef(item) === systemRef,
-        )!;
-        if (opts.scope && system.spec?.owner !== opts.scope) {
-          return acc;
-        }
-
-        const components = this.collectComponents(system);
-
-        if (components.some((c) => c.contracts.length)) {
-          return [
-            ...acc,
-            {
-              title: system.metadata.title || system.metadata.name,
-              system,
-              components,
-            },
-          ];
-        }
+    return this.getSystemEntities().reduce<SystemInfo[]>((acc, system) => {
+      if (opts.scope && system.spec?.owner !== opts.scope) {
         return acc;
-      }, [])
-      .sort((a, b) =>
-        a.system.metadata.name.localeCompare(b.system.metadata.name),
-      );
+      }
+
+      const components = this.collectComponents(system);
+
+      if (components.some((c) => c.contracts?.length)) {
+        return [
+          ...acc,
+          {
+            title: system.metadata.title || system.metadata.name,
+            system,
+            components,
+          },
+        ];
+      }
+      return acc;
+    }, []);
   }
 
   collectComponents(system: Entity): ComponentInfo[] {
@@ -74,11 +46,9 @@ export class AccessKeyCollector {
     );
     return componentRefs
       .reduce<ComponentInfo[]>((acc, componentRef) => {
-        const component = this.entities.find(
-          (item) => stringifyEntityRef(item) === componentRef.targetRef,
-        )!;
+        const component = this.entityCatalog[componentRef.targetRef];
         const contracts = this.collectContracts(componentRef).filter(
-          (c) => c.keys.length > 0,
+          (c) => c.keys && c.keys.length > 0,
         );
         if (contracts.length) {
           return [
@@ -98,18 +68,17 @@ export class AccessKeyCollector {
   }
 
   collectContracts(componentRef: EntityRelation): ContractInfo[] {
-    return this.contracts
+    return this.getApiEntities()
       .filter(
         (item) =>
+          item.spec?.type === "contract-deployment" &&
+          item.spec.network === "near" &&
+          item.spec.lifecycle === "production" &&
           item.relations!.some(
             (r) =>
               r.type === RELATION_API_PROVIDED_BY &&
               r.targetRef === componentRef.targetRef,
-          ) &&
-          item.spec?.network === "near" &&
-          // item.spec.nearKeys &&
-          // ((item.spec.nearKeys as JsonObject).keys as JsonArray).length > 0 &&
-          item.spec?.lifecycle === "production",
+          ),
       )
       .map((entity) => ({
         entity,
@@ -125,14 +94,10 @@ export class AccessKeyCollector {
           parseEntityRef(r.targetRef).kind === "resource",
       )
       .reduce<KeyInfo[]>((acc, r) => {
-        const accessKey = this.accessKeys.find(
-          (e) => stringifyEntityRef(e) === r.targetRef,
-        );
+        const accessKey = this.entityCatalog[r.targetRef];
         if (accessKey && accessKey.spec && accessKey.spec.owner) {
           const ownerRef = parseEntityRef(accessKey.spec.owner as string);
-          const owner = this.entities.find(
-            (e) => e.metadata.name === ownerRef.name,
-          );
+          const owner = this.entityCatalog[stringifyEntityRef(ownerRef)];
           if (owner) {
             return [...acc, { key: accessKey, owner }];
           }
@@ -142,29 +107,3 @@ export class AccessKeyCollector {
       .sort((a, b) => a.key.metadata.name.localeCompare(b.key.metadata.name));
   }
 }
-
-type CollectorOptions = {
-  scope?: string;
-};
-
-type SystemInfo = {
-  title: string;
-  system: Entity;
-  components: ComponentInfo[];
-};
-
-type ComponentInfo = {
-  title: string;
-  component: Entity;
-  contracts: ContractInfo[];
-};
-
-type ContractInfo = {
-  entity: Entity;
-  keys: KeyInfo[];
-};
-
-type KeyInfo = {
-  key: Entity;
-  owner: Entity;
-};

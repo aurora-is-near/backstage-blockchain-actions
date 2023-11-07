@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "type-check": "tsc",
     "clean": "rm -rf dist",
-    "build": "pnpm clean && ncc build --source-map --license licenses.txt && cp action.yml dist",
+    "build": "pnpm clean && ncc build --source-map --license licenses.txt",
+    "package": "pnpm build && cp action.yml dist",
     "ci:version": "node ./scripts/bump.js",
     "ci:publish": "node ./scripts/release.js",
     "gen:coverage-badge": "make-coverage-badge --output-path badges/coverage.svg"

@@ -40,10 +40,10 @@ export const backstageExport = async ({
     backstage_entities_repo,
   });
 
-  const multisigsCollector = new MultisigsCollector(entities, { scope });
   const filteredCollector = new FilteredCollector(entities, { scope });
-  const rbacCollector = new RbacCollector(entities, { scope });
-  const accessKeyCollector = new AccessKeyCollector(entities, { scope });
+  const multisigsCollector = new MultisigsCollector(entities);
+  const rbacCollector = new RbacCollector(entities);
+  const accessKeyCollector = new AccessKeyCollector(entities);
 
   const unknownCollector = new UnknownCollector(entities);
   const unknownSystemComponents = unknownCollector.collectEntities({ scope });
@@ -79,9 +79,9 @@ export const backstageExport = async ({
   const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
     (acc, templatePath) => {
       const templateData = {
-        multisigSystemComponents: multisigsCollector.systemComponents,
-        contractSystemComponents: rbacCollector.systemComponents,
-        accessKeySystemComponents: accessKeyCollector.systemComponents,
+        multisigSystemComponents: multisigsCollector.collectSystems({ scope }),
+        contractSystemComponents: rbacCollector.collectSystems({ scope }),
+        accessKeySystemComponents: accessKeyCollector.collectSystems({ scope }),
         unknownSystemComponents,
         filteredEntities: JSON.stringify(filteredCollector.entities, null, 2),
         testing,
