@@ -1,78 +1,39 @@
 import {
-  isApiEntity,
-  isResourceEntity,
-  stringifyEntityRef,
   RELATION_OWNED_BY,
-  RELATION_API_CONSUMED_BY,
   RELATION_HAS_PART,
   parseEntityRef,
 } from "@backstage/catalog-model";
-import type { Entity } from "@backstage/catalog-model";
+import type { Entity, EntityRelation } from "@backstage/catalog-model";
+import { BaseCollector } from "./base-collector";
+import {
+  CollectorOptions,
+  ComponentInfo,
+  MultisigInfo,
+  SignerInfo,
+  SystemInfo,
+} from "../types";
 
-type MultisigSigner = {
-  signer: Entity;
-  owner?: Entity;
-};
-type MultisigSignerAndKeysComposed = MultisigSigner & { keys: Entity[] };
-type MultisigSignerAndKeys = {
-  [K in keyof MultisigSignerAndKeysComposed]: MultisigSignerAndKeysComposed[K];
-};
-
-type MultisigInfo = {
-  entity: Entity;
-  signers: MultisigSigner[];
-};
-
-type ComponentMultisigs = {
-  title: string;
-  component: Entity;
-  multisigs: MultisigInfo[];
-};
-
-type SystemComponents = {
-  title: string;
-  system: Entity;
-  components: ComponentMultisigs[];
-};
-
-export class MultisigsCollector {
-  systemComponents: SystemComponents[] = [];
-  private entities: Entity[] = [];
-  private apiEntities: Entity[] = [];
-  private resourceEntities: Entity[] = [];
+export class MultisigsCollector extends BaseCollector {
   private multisigs: Entity[] = [];
-  private contracts: Entity[] = [];
-  private accessKeys: Entity[] = [];
 
-  constructor(entities: Entity[], opts: CollectorOptions = {}) {
-    this.entities = entities;
-    this.apiEntities = this.entities.filter(isApiEntity);
-    this.resourceEntities = this.entities.filter(isResourceEntity);
-    this.multisigs = this.apiEntities.filter(
+  constructor(entities: Entity[]) {
+    super(entities);
+    this.multisigs = this.getApiEntities().filter(
       (item) => item.spec?.type === "multisig-deployment",
     );
-    this.contracts = this.apiEntities.filter(
-      (item) => item.spec?.type === "contract-deployment",
-    );
-    this.accessKeys = this.resourceEntities.filter(
-      (item) => item.spec?.type === "access-key",
-    );
-    this.systemComponents = this.collectSystems(opts);
   }
 
   normalizeEntities(list: string[]) {
     return [...new Set(list)].sort((a, b) => a.localeCompare(b));
   }
 
-  collectSystems(opts: CollectorOptions) {
+  collectSystems(opts: CollectorOptions): SystemInfo[] {
     const systemRefs = this.normalizeEntities(
       this.multisigs.map((item) => item.spec!.system! as string),
     );
     return systemRefs
-      .reduce<SystemComponents[]>((acc, systemRef) => {
-        const system = this.entities.find(
-          (item) => stringifyEntityRef(item) === systemRef,
-        )!;
+      .reduce<SystemInfo[]>((acc, systemRef) => {
+        const system = this.entityCatalog[systemRef];
         if (opts.scope && system.spec?.owner !== opts.scope) {
           return acc;
         }
@@ -92,7 +53,7 @@ export class MultisigsCollector {
       );
   }
 
-  collectComponents(system: Entity) {
+  collectComponents(system: Entity): ComponentInfo[] {
     const componentRefs = system.relations!.filter(
       (r) =>
         r.type === RELATION_HAS_PART &&
@@ -100,24 +61,11 @@ export class MultisigsCollector {
     );
     return componentRefs
       .map((componentRef) => {
-        const component = this.entities.find(
-          (item) => stringifyEntityRef(item) === componentRef.targetRef,
-        )!;
+        const component = this.entityCatalog[componentRef.targetRef];
         return {
           title: component.metadata.title || component.metadata.name,
           component,
-          multisigs: this.multisigs
-            .filter((item) =>
-              item.relations!.some(
-                (r) =>
-                  r.type === "apiProvidedBy" &&
-                  r.targetRef === componentRef.targetRef,
-              ),
-            )
-            .map((ms) => ({
-              entity: ms,
-              signers: this.collectSigners(ms),
-            })),
+          multisigs: this.collectMultisigs(componentRef),
         };
       })
       .sort((a, b) =>
@@ -125,7 +73,22 @@ export class MultisigsCollector {
       );
   }
 
-  collectSigners(multisig: Entity) {
+  collectMultisigs(componentRef: EntityRelation): MultisigInfo[] {
+    return this.multisigs
+      .filter((item) =>
+        item.relations!.some(
+          (r) =>
+            r.type === "apiProvidedBy" &&
+            r.targetRef === componentRef.targetRef,
+        ),
+      )
+      .map((ms) => ({
+        entity: ms,
+        signers: this.collectSigners(ms),
+      }));
+  }
+
+  collectSigners(multisig: Entity): SignerInfo[] {
     return multisig
       .relations!.filter(
         (r) =>
@@ -133,12 +96,8 @@ export class MultisigsCollector {
           parseEntityRef(r.targetRef).kind !== "group",
       )
       .map((r) => {
-        const signer = this.entities.find(
-          (e) => stringifyEntityRef(e) === r.targetRef,
-        )!;
-        const owner = this.entities.find(
-          (e) => stringifyEntityRef(e) === signer.spec!.owner,
-        )!;
+        const signer = this.entityCatalog[r.targetRef];
+        const owner = this.entityCatalog[signer.spec!.owner!.toString()];
         return {
           signer,
           owner,
@@ -148,160 +107,4 @@ export class MultisigsCollector {
         a.owner.metadata.name.localeCompare(b.owner.metadata.name),
       );
   }
-
-  getAllApis() {
-    return this.apiEntities;
-  }
-
-  getAllResources() {
-    return this.resourceEntities;
-  }
-
-  getMultisigs() {
-    return this.systemComponents.flatMap((system) =>
-      system.components.flatMap((component) => component.multisigs),
-    );
-  }
-
-  getNearContracts() {
-    return this.contracts.filter((entity) => entity.spec?.network === "near");
-  }
-
-  getSigners() {
-    const allSigners = this.getMultisigs().flatMap((ms) => ms.signers);
-    const uniqueSigners = allSigners.reduce<{ [uid: string]: MultisigSigner }>(
-      (acc, signer) => {
-        const uid = signer.signer.metadata.uid;
-        if (uid && uid in allSigners) {
-          return acc;
-        }
-        if (!this.isQualifiedEntity(signer.signer)) {
-          return acc;
-        }
-        return { ...acc, [uid as string]: signer };
-      },
-      {},
-    );
-    return Object.values(uniqueSigners);
-  }
-
-  getMultisigAccessKeys(): Entity[] {
-    const signers = this.getSigners().filter(
-      (value) => value.signer.spec?.network === "near",
-    );
-    const keys = signers.flatMap((value) => {
-      if (!value.signer.relations) {
-        return [];
-      }
-      return value.signer.relations
-        .filter(
-          (r) =>
-            r.type === RELATION_API_CONSUMED_BY &&
-            parseEntityRef(r.targetRef).kind === "resource",
-        )
-        .map((relation) => {
-          const key = this.entities.find(
-            (e) => stringifyEntityRef(e) === relation.targetRef,
-          );
-          return key;
-        });
-    });
-
-    return keys.filter<Entity>(this.isEntity).filter(this.isQualifiedEntity);
-  }
-
-  getAccessKeysPerSigner() {
-    const signers = this.getSigners().filter(
-      (value) => value.signer.spec?.network === "near",
-    );
-    const keysPerSigner = signers.reduce<{
-      [s: string]: MultisigSignerAndKeys;
-    }>((acc, value) => {
-      if (!value.signer.relations) {
-        return acc;
-      }
-      const spec = JSON.parse(JSON.stringify(value.signer.spec));
-      const signer: string = spec.address;
-      const keys = value.signer.relations
-        .filter(
-          (r) =>
-            r.type === RELATION_API_CONSUMED_BY &&
-            parseEntityRef(r.targetRef).kind === "resource",
-        )
-        .map((relation) => {
-          const key = this.entities.find(
-            (e) => stringifyEntityRef(e) === relation.targetRef,
-          );
-          return key;
-        })
-        .filter<Entity>(this.isEntity);
-
-      return {
-        ...acc,
-        [signer]: {
-          owner: value.owner,
-          signer: value.signer,
-          keys,
-        },
-      };
-    }, {});
-
-    return keysPerSigner;
-  }
-
-  getContractAccessKeys(): Entity[] {
-    const keys = this.contracts.flatMap((value) => {
-      if (!value.relations) {
-        return [];
-      }
-      return value.relations
-        .filter(
-          (r) =>
-            r.type === RELATION_API_CONSUMED_BY &&
-            parseEntityRef(r.targetRef).kind === "resource",
-        )
-        .map((relation) => {
-          const key = this.entities.find(
-            (e) => stringifyEntityRef(e) === relation.targetRef,
-          );
-          return key;
-        });
-    });
-    return keys.filter<Entity>(this.isEntity);
-  }
-
-  getAllAccessKeys(): Entity[] {
-    return this.accessKeys;
-  }
-
-  getDeprecatedAccessKeys(): Entity[] {
-    const keys = this.getAllAccessKeys();
-    const deprecated = keys.filter(
-      (entity) => entity.metadata.tags?.includes("deprecated"),
-    );
-    return deprecated;
-  }
-
-  getUnknownAccessKeys(): Entity[] {
-    const keys = this.getAllAccessKeys();
-    const unknown = keys.filter(
-      (entity) => entity.metadata.tags?.includes("unknown"),
-    );
-    return unknown;
-  }
-
-  private isQualifiedEntity(entity: Entity) {
-    return (
-      !entity.metadata.tags?.includes("retired") &&
-      !entity.metadata.tags?.includes("allow-unknown")
-    );
-  }
-
-  private isEntity(entity: Entity | undefined): entity is Entity {
-    return entity !== undefined;
-  }
 }
-
-type CollectorOptions = {
-  scope?: string;
-};

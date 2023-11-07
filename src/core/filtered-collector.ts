@@ -1,6 +1,7 @@
 import type { JsonObject } from "@backstage/types";
 import type { Entity } from "@backstage/catalog-model";
-import { pick } from "./pick";
+import { pick } from "../utils/pick";
+import { CollectorOptions } from "../types";
 
 const ALLOWED_KINDS = ["Component", "System", "API"];
 const ALLOWED_SPEC_FIELDS = [
@@ -54,7 +55,3 @@ export class FilteredCollector {
       });
   }
 }
-
-type CollectorOptions = {
-  scope?: string;
-};

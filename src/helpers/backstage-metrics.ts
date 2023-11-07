@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import { client, v2 } from "@datadog/datadog-api-client";
 import type { Entity } from "@backstage/catalog-model";
 
-import { MultisigsCollector } from "../core/multisigs-collector";
+import { MetricsCollector } from "../core/metrics-collector";
 import { getBackstageEntities } from "../utils/get-backstage-entities";
 
 const configuration = client.createConfiguration();
@@ -24,47 +24,38 @@ export async function backstageMetrics({
   if (!backstage_url) return;
   const entities = await getBackstageEntities({ backstage_url });
 
-  const multisigsCollector = new MultisigsCollector(entities);
+  const collector = new MetricsCollector(entities);
 
   try {
-    const multisigSeries = generateMultisigMetrics(
-      multisigsCollector,
-      backstage_url,
-    );
-    const signerSeries = generateSignerMetrics(
-      multisigsCollector,
-      backstage_url,
-    );
-    const keySeries = generateAccessKeyMetrics(
-      multisigsCollector,
-      backstage_url,
-    );
+    const multisigSeries = generateMultisigMetrics(collector, backstage_url);
+    const signerSeries = generateSignerMetrics(collector, backstage_url);
+    const keySeries = generateAccessKeyMetrics(collector, backstage_url);
     const keyCountByOwnerSeries = generateUserAccessKeyMetrics(
-      multisigsCollector,
+      collector,
       backstage_url,
     );
     const keyCountByContractSeries = generateContractAccessKeyMetrics(
-      multisigsCollector,
+      collector,
       backstage_url,
     );
     const deprecatedKeysSeries = generateDeprecatedAccessKeyMetrics(
-      multisigsCollector,
+      collector,
       backstage_url,
     );
     const unknownAccessKeysSeries = generateUnknownAccessKeyMetrics(
-      multisigsCollector,
+      collector,
       backstage_url,
     );
     const unknownSignerSeries = generateUnknownSignerMetrics(
-      multisigsCollector,
+      collector,
       backstage_url,
     );
     const unknownAddressSeries = generateUnknownAddressMetrics(
-      multisigsCollector,
+      collector,
       backstage_url,
     );
     const inactiveSignerSeries = generateInactiveSignerMetrics(
-      multisigsCollector,
+      collector,
       backstage_url,
     );
     // const unverifiedContractSeries = generateUnverifiedContractsMetrics(multisigsCollector, backstage_url);
@@ -106,7 +97,7 @@ async function submitMetrics(series: v2.MetricSeries[]) {
 }
 
 function generateMultisigMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const series = collector.getMultisigs().map<v2.MetricSeries>((multisig) => {
@@ -161,7 +152,7 @@ function generateMultisigMetrics(
 }
 
 function generateSignerMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const series = collector.getSigners().map<v2.MetricSeries>((signer) => {
@@ -203,7 +194,7 @@ function generateSignerMetrics(
 }
 
 function generateUnknownSignerMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const unknownSigners = collector
@@ -253,7 +244,7 @@ function generateUnknownSignerMetrics(
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function generateUnverifiedContractsMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const unverifiedContracts = collector
@@ -298,7 +289,7 @@ function generateUnverifiedContractsMetrics(
 }
 
 function generateUnknownAddressMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const stubAndStateEntities = collector
@@ -347,7 +338,7 @@ function generateUnknownAddressMetrics(
 }
 
 function generateAccessKeyMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const series = collector
@@ -389,7 +380,7 @@ function generateAccessKeyMetrics(
 }
 
 function generateDeprecatedAccessKeyMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const series = collector
@@ -431,7 +422,7 @@ function generateDeprecatedAccessKeyMetrics(
 }
 
 function generateUnknownAccessKeyMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const series = collector
@@ -473,7 +464,7 @@ function generateUnknownAccessKeyMetrics(
 }
 
 function generateUserAccessKeyMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const series = Object.entries(
@@ -509,7 +500,7 @@ type KeysByOwner = {
 };
 
 function generateContractAccessKeyMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const accessKeysPerContract = collector
@@ -547,7 +538,7 @@ function generateContractAccessKeyMetrics(
 }
 
 function generateInactiveSignerMetrics(
-  collector: MultisigsCollector,
+  collector: MetricsCollector,
   backstageUrl: string,
 ) {
   const series = collector.getSigners().map<v2.MetricSeries>((entity) => {
