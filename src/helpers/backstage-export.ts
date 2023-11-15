@@ -10,6 +10,7 @@ import { FilteredCollector } from "../core/filtered-collector";
 import { RbacCollector } from "../core/rbac-collector";
 import { AccessKeyCollector } from "../core/access-key-collector";
 import { UnknownCollector } from "../core/unknown-collector";
+import { AddressCollector } from "../core/address-collector";
 import { getBackstageEntities } from "../utils/get-backstage-entities";
 
 export class BackstageExport {
@@ -44,37 +45,8 @@ export const backstageExport = async ({
   const multisigsCollector = new MultisigsCollector(entities);
   const rbacCollector = new RbacCollector(entities);
   const accessKeyCollector = new AccessKeyCollector(entities);
-
   const unknownCollector = new UnknownCollector(entities);
-  const unknownSystemComponents = unknownCollector.collectEntities({ scope });
-  // for (const system of unknownSystemComponents) {
-  //   for (const component of system.components) {
-  //     console.log("component:", component.component.metadata.name);
-  //     if (component.multisigs) {
-  //       for (const multisig of component.multisigs) {
-  //         console.log("multisig:", multisig.entity.metadata.name);
-  //         console.log("signers:", multisig.signers.length);
-  //       }
-  //     }
-  //     if (component.contracts) {
-  //       for (const contract of component.contracts) {
-  //         console.log("contract:", contract.entity.metadata.name);
-  //         console.log("keys:", contract?.keys?.length);
-  //         if (contract.keys) {
-  //           for (const key of contract.keys) {
-  //             console.log(key);
-  //           }
-  //         }
-  //         console.log("roles:", contract?.roles?.length);
-  //         if (contract.roles) {
-  //           for (const role of contract.roles) {
-  //             console.log(role);
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
+  const addressCollector = new AddressCollector(entities);
 
   const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
     (acc, templatePath) => {
@@ -82,7 +54,8 @@ export const backstageExport = async ({
         multisigSystemComponents: multisigsCollector.collectSystems({ scope }),
         contractSystemComponents: rbacCollector.collectSystems({ scope }),
         accessKeySystemComponents: accessKeyCollector.collectSystems({ scope }),
-        unknownSystemComponents,
+        unknownSystemComponents: unknownCollector.collectEntities({ scope }),
+        addresses: addressCollector.collectAddresses({ scope }),
         filteredEntities: JSON.stringify(filteredCollector.entities, null, 2),
         testing,
       };
