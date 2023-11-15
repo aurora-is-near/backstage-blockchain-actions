@@ -46,7 +46,7 @@ export const backstageExport = async ({
   const rbacCollector = new RbacCollector(entities);
   const accessKeyCollector = new AccessKeyCollector(entities);
   const unknownCollector = new UnknownCollector(entities);
-  const entityCollector = new AddressCollector(entities);
+  const addressCollector = new AddressCollector(entities);
 
   const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
     (acc, templatePath) => {
@@ -55,7 +55,7 @@ export const backstageExport = async ({
         contractSystemComponents: rbacCollector.collectSystems({ scope }),
         accessKeySystemComponents: accessKeyCollector.collectSystems({ scope }),
         unknownSystemComponents: unknownCollector.collectEntities({ scope }),
-        addresses: entityCollector.collectAddresses({ scope }),
+        addresses: addressCollector.collectAddresses({ scope }),
         filteredEntities: JSON.stringify(filteredCollector.entities, null, 2),
         testing,
       };
