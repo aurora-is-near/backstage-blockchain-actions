@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.10
+
+### Patch Changes
+
+- a7798a1: feat: add eoa report
+
 ## 1.0.9
 
 ### Patch Changes
