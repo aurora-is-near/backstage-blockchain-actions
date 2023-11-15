@@ -9,7 +9,11 @@ import {
 export class AddressCollector extends BaseCollector {
   collectAddresses(opts: CollectorOptions): SignerInfo[] {
     const entities = opts.scope
-      ? this.getResourceEntities().filter((e) => e.spec?.owner === opts.scope)
+      ? this.getResourceEntities().filter(
+          (e) =>
+            e.relations &&
+            e.relations.some((r) => r.targetRef.includes(opts.scope!)),
+        )
       : this.getResourceEntities();
     return entities
       .filter((e) => e.spec?.type === "signer-address")
