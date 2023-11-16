@@ -25,6 +25,7 @@ export type ContractInfo = {
   entity: Entity;
   keys?: KeyInfo[];
   roles?: RoleInfo[];
+  addresses?: SignerInfo[];
 };
 
 export type MultisigInfo = {
