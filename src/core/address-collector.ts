@@ -33,7 +33,7 @@ export class AddressCollector extends BaseCollector {
             (relation) =>
               relation.type === RELATION_CONSUMES_API &&
               this.entityCatalog[relation.targetRef].spec?.type ===
-              "contract-deployment",
+                "contract-deployment",
           )
           .map((relation) => this.entityCatalog[relation.targetRef]);
         const roles = signer
@@ -41,7 +41,7 @@ export class AddressCollector extends BaseCollector {
             (relation) =>
               relation.type === RELATION_MEMBER_OF &&
               this.entityCatalog[relation.targetRef].spec?.type ===
-              "role-group",
+                "role-group",
           )
           .map((relation) => this.entityCatalog[relation.targetRef]);
         const keys = signer
@@ -49,7 +49,7 @@ export class AddressCollector extends BaseCollector {
             (relation) =>
               relation.type === RELATION_OWNER_OF &&
               this.entityCatalog[relation.targetRef].spec?.type ===
-              "access-key",
+                "access-key",
           )
           .map((relation) => this.entityCatalog[relation.targetRef]);
         return [...acc, { signer, contracts, roles, keys }];
