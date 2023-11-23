@@ -1,5 +1,6 @@
 import { BaseCollector } from "./base-collector";
 import {
+  AddressInfo,
   CollectorOptions,
   ComponentInfo,
   ContractInfo,
@@ -9,12 +10,56 @@ import {
 import {
   Entity,
   RELATION_API_CONSUMED_BY,
+  RELATION_CONSUMES_API,
   RELATION_HAS_PART,
+  RELATION_MEMBER_OF,
+  RELATION_OWNER_OF,
   RELATION_PROVIDES_API,
   parseEntityRef,
 } from "@backstage/catalog-model";
 
 export class AddressCollector extends BaseCollector {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  collectAddresses(opts: CollectorOptions): AddressInfo[] {
+    return this.getResourceEntities()
+      .filter(
+        (entity) =>
+          entity.spec?.type === "signer-address" ||
+          entity.spec?.type?.toString().includes("-address"),
+      )
+      .reduce<AddressInfo[]>((acc, signer) => {
+        const contracts = signer
+          .relations!.filter(
+            (relation) =>
+              relation.type === RELATION_CONSUMES_API &&
+              this.entityCatalog[relation.targetRef].spec?.type ===
+              "contract-deployment",
+          )
+          .map((relation) => this.entityCatalog[relation.targetRef]);
+        const roles = signer
+          .relations!.filter(
+            (relation) =>
+              relation.type === RELATION_MEMBER_OF &&
+              this.entityCatalog[relation.targetRef].spec?.type ===
+              "role-group",
+          )
+          .map((relation) => this.entityCatalog[relation.targetRef]);
+        const keys = signer
+          .relations!.filter(
+            (relation) =>
+              relation.type === RELATION_OWNER_OF &&
+              this.entityCatalog[relation.targetRef].spec?.type ===
+              "access-key",
+          )
+          .map((relation) => this.entityCatalog[relation.targetRef]);
+        return [...acc, { signer, contracts, roles, keys }];
+      }, [])
+      .filter(
+        (info) =>
+          info.keys?.length || info.contracts?.length || info.roles?.length,
+      );
+  }
+
   collectSystems(opts: CollectorOptions): SystemInfo[] {
     return this.getSystemEntities().reduce<SystemInfo[]>((acc, system) => {
       if (opts.scope && system.spec?.owner !== opts.scope) {
@@ -75,13 +120,16 @@ export class AddressCollector extends BaseCollector {
         const entity = this.entityCatalog[contractRef.targetRef];
         return {
           entity,
-          addresses: this.collectAddresses(entity, opts),
+          addresses: this.collectAddressesPerContract(entity, opts),
         };
       })
       .sort((a, b) => this.sortByName(a.entity, b.entity));
   }
 
-  collectAddresses(contract: Entity, opts: CollectorOptions): SignerInfo[] {
+  collectAddressesPerContract(
+    contract: Entity,
+    opts: CollectorOptions,
+  ): SignerInfo[] {
     return contract
       .relations!.filter(
         (r) =>

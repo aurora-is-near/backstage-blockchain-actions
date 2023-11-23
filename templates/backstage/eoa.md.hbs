@@ -1,37 +1,40 @@
 # Addresses
 
-{{#each addressSystemComponents~}}
-
-## [{{title}}]({{backstageLink system}})
-
-{{#if system.metadata.description}}
-{{system.metadata.description}}
-{{/if}}
-
-{{#each components~}}
-### [{{title}}]({{backstageLink component}})
-
-{{#if component.metadata.description}}
-{{component.metadata.description}}
-
-{{/if}}
-
-{{#if contracts}}
-{{#each contracts}}
-#### [{{entity.metadata.title}}]({{backstageLink entity}})
-
-{{#if entity.metadata.description}}
-{{entity.metadata.description}}
-
-{{/if}}
-
-{{#each addresses}}
-##### [{{signer.metadata.title}}]({{backstageLink signer}})
+{{#each addresses~}}
+### [{{signer.metadata.title}}]({{backstageLink signer}})
 
 {{#if signer.metadata.description}}
 {{signer.metadata.description}}
 
 {{/if}}
+
+{{#if contracts}}
+#### Contracts
+
+{{#each contracts}}
+- [{{this.metadata.title}}]({{backstageLink this}})
+{{/each}}
+
+{{/if}}
+
+{{#if keys}}
+#### Keys
+
+{{#each keys}}
+- [{{this.metadata.title}}]({{backstageLink this}})
+{{/each}}
+
+{{/if}}
+
+{{#if roles}}
+#### Roles
+
+{{#each roles}}
+- [{{this.metadata.title}}]({{backstageLink this}})
+{{/each}}
+
+{{/if}}
+
 {{#if signer.metadata.links}}
 ###### External Links
 
@@ -40,12 +43,5 @@
 {{/each}}
 
 {{/if}}
-
-{{/each}}
-
-{{/each}}
-{{/if}}
-
-{{/each}}
 
 {{/each}}

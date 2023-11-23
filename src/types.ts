@@ -51,6 +51,13 @@ export type SignerInfo = OwnedEntity<{
   keys?: Entity[];
 }>;
 
+export type AddressInfo = OwnedEntity<{
+  signer: Entity;
+  keys?: Entity[];
+  roles?: Entity[];
+  contracts?: Entity[];
+}>;
+
 type OwnedEntity<T> = {
   [K in keyof T]: T[K];
 } & {
