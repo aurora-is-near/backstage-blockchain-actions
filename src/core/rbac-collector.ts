@@ -9,6 +9,7 @@ import type { Entity, EntityRelation } from "@backstage/catalog-model";
 import type { JsonArray } from "@backstage/types";
 import { BaseCollector } from "./base-collector";
 import {
+  AdminInfo,
   CollectorOptions,
   ComponentInfo,
   ContractInfo,
@@ -82,6 +83,7 @@ export class RbacCollector extends BaseCollector {
       )
       .map((entity) => ({
         entity,
+        admins: this.collectAdmins(entity),
         roles: this.collectRoles(entity),
       }));
   }
@@ -95,7 +97,12 @@ export class RbacCollector extends BaseCollector {
       )
       .reduce<RoleInfo[]>((acc, r) => {
         const roleGroup = this.entityCatalog[r.targetRef];
-        if (roleGroup && roleGroup.spec && roleGroup.spec.members) {
+        if (
+          roleGroup &&
+          roleGroup.spec &&
+          roleGroup.spec.members &&
+          roleGroup.spec.roleId !== roleGroup.spec.admin
+        ) {
           const specMembers = roleGroup.spec.members as JsonArray;
           const members = specMembers.reduce<MemberInfo[]>((accMembers, m) => {
             const member = this.entities.find(
@@ -120,5 +127,41 @@ export class RbacCollector extends BaseCollector {
         return acc;
       }, [])
       .sort((a, b) => a.role.metadata.name.localeCompare(b.role.metadata.name));
+  }
+
+  collectAdmins(contract: Entity): AdminInfo[] {
+    return contract
+      .relations!.filter(
+        (r) =>
+          r.type === RELATION_DEPENDS_ON &&
+          parseEntityRef(r.targetRef).kind === "api",
+      )
+      .reduce<AdminInfo[]>((acc, r) => {
+        const roleGroup = this.entityCatalog[r.targetRef];
+        if (roleGroup && roleGroup.spec?.roleId === roleGroup.spec?.admin) {
+          const specMembers = roleGroup.spec?.members as JsonArray;
+          const members = specMembers.reduce<MemberInfo[]>((accMembers, m) => {
+            const member = this.entities.find(
+              (e) =>
+                e.spec &&
+                // filter out role-groups since they are modeled with
+                // the same fields as a blockchain address
+                e.spec.type !== "role-group" &&
+                e.spec.address?.toString().toLowerCase() === m &&
+                e.spec.network === roleGroup.spec?.network &&
+                e.spec.networkType === roleGroup.spec?.networkType,
+            );
+            if (member) {
+              const ownerRef = parseEntityRef(member.spec?.owner as string);
+              const owner = this.entityCatalog[stringifyEntityRef(ownerRef)];
+              return [...accMembers, { member, owner }];
+            }
+            return accMembers;
+          }, []);
+          return [...acc, { adminRole: roleGroup, members }];
+        }
+        return acc;
+      }, [])
+      .sort((a, b) => this.sortByName(a.adminRole, b.adminRole));
   }
 }

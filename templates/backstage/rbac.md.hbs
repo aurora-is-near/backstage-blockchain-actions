@@ -25,6 +25,23 @@
             {{#if roles~}}
                 ##### Roles
 
+                {{#if admins~}}
+                    ###### Admins
+
+                    {{#each admins~}}
+                        {{#if adminRole.metadata.title~}}
+                            [{{adminRole.metadata.title}}]({{backstageLink adminRole}})
+                        {{/if}}
+
+                        {{#if members~}}
+                            {{#each members~}}
+                                - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{member.metadata.title}}]({{backstageLink member}}))
+                            {{/each}}
+                        {{/if}}
+
+                    {{/each}}
+                {{/if}}
+
                 {{#each roles~}}
                     {{#if role.metadata.title~}}
                         ##### [{{role.metadata.title}}]({{backstageLink role}})

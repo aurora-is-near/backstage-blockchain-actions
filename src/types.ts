@@ -24,12 +24,18 @@ export type ComponentInfo = {
 export type ContractInfo = {
   entity: Entity;
   keys?: KeyInfo[];
+  admins?: AdminInfo[];
   roles?: RoleInfo[];
 };
 
 export type MultisigInfo = {
   entity: Entity;
   signers: SignerInfo[];
+};
+
+export type AdminInfo = {
+  adminRole: Entity;
+  members: MemberInfo[];
 };
 
 export type RoleInfo = {
