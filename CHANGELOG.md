@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.11
+
+### Patch Changes
+
+- 801c2f3: feat: add super admins to rbac report
+
 ## 1.0.10
 
 ### Patch Changes
