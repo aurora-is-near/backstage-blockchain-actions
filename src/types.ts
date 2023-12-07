@@ -2,6 +2,7 @@ import { Entity } from "@backstage/catalog-model";
 
 export type CollectorOptions = {
   scope?: string;
+  lifecycle?: string;
 };
 
 export type EntityCatalog = {

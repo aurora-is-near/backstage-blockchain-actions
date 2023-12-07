@@ -25,7 +25,7 @@ export class RbacCollector extends BaseCollector {
         return acc;
       }
 
-      const components = this.collectComponents(system);
+      const components = this.collectComponents(system, opts);
 
       if (components.some((c) => c.contracts?.length)) {
         return [
@@ -41,7 +41,10 @@ export class RbacCollector extends BaseCollector {
     }, []);
   }
 
-  collectComponents(system: Entity): ComponentInfo[] {
+  collectComponents(
+    system: Entity,
+    opts: CollectorOptions = {},
+  ): ComponentInfo[] {
     const componentRefs = system.relations!.filter(
       (r) =>
         r.type === RELATION_HAS_PART &&
@@ -50,6 +53,10 @@ export class RbacCollector extends BaseCollector {
     return componentRefs
       .reduce<ComponentInfo[]>((acc, componentRef) => {
         const component = this.entityCatalog[componentRef.targetRef];
+        if (opts.lifecycle && component.spec?.lifecycle !== opts.lifecycle) {
+          return acc;
+        }
+
         const contracts = this.collectContracts(componentRef);
         if (contracts.length) {
           return [

@@ -19,6 +19,7 @@ export class BackstageExport {
   template_path = "";
   output_path = "";
   scope?: string;
+  lifecycle?: string;
   testing?: boolean;
 }
 
@@ -28,6 +29,7 @@ export const backstageExport = async ({
   template_path,
   output_path,
   scope,
+  lifecycle,
   testing,
 }: BackstageExport) => {
   if (!template_path || !output_path) {
@@ -41,7 +43,10 @@ export const backstageExport = async ({
     backstage_entities_repo,
   });
 
-  const filteredCollector = new FilteredCollector(entities, { scope });
+  const filteredCollector = new FilteredCollector(entities, {
+    scope,
+    lifecycle,
+  });
   const multisigsCollector = new MultisigsCollector(entities);
   const rbacCollector = new RbacCollector(entities);
   const accessKeyCollector = new AccessKeyCollector(entities);
@@ -51,11 +56,23 @@ export const backstageExport = async ({
   const changedFiles = sync(`${template_path}**/*.hbs`).reduce<string[]>(
     (acc, templatePath) => {
       const templateData = {
-        multisigSystemComponents: multisigsCollector.collectSystems({ scope }),
-        contractSystemComponents: rbacCollector.collectSystems({ scope }),
-        accessKeySystemComponents: accessKeyCollector.collectSystems({ scope }),
-        unknownSystemComponents: unknownCollector.collectEntities({ scope }),
-        addresses: addressCollector.collectAddresses({ scope }),
+        multisigSystemComponents: multisigsCollector.collectSystems({
+          scope,
+          lifecycle,
+        }),
+        contractSystemComponents: rbacCollector.collectSystems({
+          scope,
+          lifecycle,
+        }),
+        accessKeySystemComponents: accessKeyCollector.collectSystems({
+          scope,
+          lifecycle,
+        }),
+        unknownSystemComponents: unknownCollector.collectEntities({
+          scope,
+          lifecycle,
+        }),
+        addresses: addressCollector.collectAddresses({ scope, lifecycle }),
         filteredEntities: JSON.stringify(filteredCollector.entities, null, 2),
         testing,
       };
