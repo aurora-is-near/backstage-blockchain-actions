@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.12
+
+### Patch Changes
+
+- e24c458: feat: add lifecycle workflow input
+
 ## 1.0.11
 
 ### Patch Changes
