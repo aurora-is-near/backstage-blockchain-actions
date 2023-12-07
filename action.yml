@@ -12,6 +12,8 @@ inputs:
     required: false
   scope:
     description: "Group or User entity name to filter by ownership of entities"
+  lifecycle:
+    description: "Spec lifecycle name to filter entities by"
   template_path:
     description: "Handlebars Template Path"
     required: false
