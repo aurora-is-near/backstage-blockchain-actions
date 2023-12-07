@@ -72,5 +72,5 @@ jobs:
           backstage_url: https://example.com
           template_path: templates/backstage
           lifecycle: production
-          output_path: ./scoped/
+          output_path: ./lifecycle/
 ```
