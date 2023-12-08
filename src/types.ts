@@ -20,6 +20,7 @@ export type ComponentInfo = {
   component: Entity;
   contracts?: ContractInfo[];
   multisigs?: MultisigInfo[];
+  tags?: string;
 };
 
 export type ContractInfo = {
@@ -27,11 +28,13 @@ export type ContractInfo = {
   keys?: KeyInfo[];
   admins?: AdminInfo[];
   roles?: RoleInfo[];
+  tags?: string;
 };
 
 export type MultisigInfo = {
   entity: Entity;
   signers: SignerInfo[];
+  tags?: string;
 };
 
 export type AdminInfo = {
@@ -55,6 +58,7 @@ export type KeyInfo = OwnedEntity<{
 export type SignerInfo = OwnedEntity<{
   signer: Entity;
   keys?: Entity[];
+  tags?: string;
 }>;
 
 type OwnedEntity<T> = {
