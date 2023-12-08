@@ -9,7 +9,7 @@
 {{/if}}
 
 {{#each components~}}
-### [{{title}}]({{backstageLink component}})
+### [{{title}}]({{backstageLink component}}) (Tags: {{tags}})
 
 {{#if component.metadata.description}}
 {{component.metadata.description}}
@@ -18,7 +18,7 @@
 
 {{#if contracts}}
 {{#each contracts}}
-#### [{{entity.metadata.title}}]({{backstageLink entity}})
+#### [{{entity.metadata.title}}]({{backstageLink entity}}) (Tags: {{tags}})
 
 {{#if entity.metadata.description}}
 {{entity.metadata.description}}
