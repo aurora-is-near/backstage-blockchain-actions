@@ -58,6 +58,7 @@ export type KeyInfo = OwnedEntity<{
 export type SignerInfo = OwnedEntity<{
   signer: Entity;
   keys?: Entity[];
+  tags?: string;
 }>;
 
 type OwnedEntity<T> = {

@@ -115,6 +115,7 @@ export class MultisigsCollector extends BaseCollector {
         return {
           signer,
           owner,
+          tags: signer.metadata.tags?.join(", ") || "None",
         };
       })
       .sort((a, b) =>
