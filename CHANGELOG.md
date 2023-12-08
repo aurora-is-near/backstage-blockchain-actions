@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.13
+
+### Patch Changes
+
+- 89d541e: feat: add tags to reports
+
 ## 1.0.12
 
 ### Patch Changes
