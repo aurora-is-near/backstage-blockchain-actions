@@ -65,7 +65,7 @@
 
 {{#if multisigs}}
 {{#each multisigs}}
-#### [{{entity.metadata.title}}]({{backstageLink entity}})
+#### [{{entity.metadata.title}}]({{backstageLink entity}}) (Tags: {{tags}})
 
 {{#if entity.metadata.description}}
 {{entity.metadata.description}}
@@ -75,7 +75,7 @@
 ##### Signers
 
 {{#each signers}}
-- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{signer.metadata.name}}]({{backstageLink signer}}))
+- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{signer.metadata.name}}]({{backstageLink signer}})) (Tags: {{tags}})
 {{/each}}
 {{/if}}
 {{#if entity.metadata.links}}
