@@ -53,6 +53,7 @@ export type MemberInfo = OwnedEntity<{
 
 export type KeyInfo = OwnedEntity<{
   key: Entity;
+  tags?: string;
 }>;
 
 export type SignerInfo = OwnedEntity<{
