@@ -108,7 +108,14 @@ export class AccessKeyCollector extends BaseCollector {
           const ownerRef = parseEntityRef(accessKey.spec.owner as string);
           const owner = this.entityCatalog[stringifyEntityRef(ownerRef)];
           if (owner) {
-            return [...acc, { key: accessKey, owner }];
+            return [
+              ...acc,
+              {
+                key: accessKey,
+                owner,
+                tags: accessKey.metadata.tags?.join(", ") || "None",
+              },
+            ];
           }
         }
         return acc;
