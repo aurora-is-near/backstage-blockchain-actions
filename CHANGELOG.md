@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.14
+
+### Patch Changes
+
+- b731c73: feat: add tags to keys in reports
+
 ## 1.0.13
 
 ### Patch Changes
