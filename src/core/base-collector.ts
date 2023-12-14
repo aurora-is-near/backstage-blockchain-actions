@@ -31,6 +31,10 @@ export class BaseCollector {
     return this.entities.filter(isResourceEntity).sort(this.sortByName);
   }
 
+  getEntityTags(entity: Entity): string {
+    return entity.metadata.tags?.join(' ') || 'None';
+  }
+
   sortByName(a: Entity, b: Entity) {
     return a.metadata.name.localeCompare(b.metadata.name);
   }

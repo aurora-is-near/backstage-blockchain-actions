@@ -64,7 +64,7 @@ export class AccessKeyCollector extends BaseCollector {
               title: component.metadata.title || component.metadata.name,
               component,
               contracts,
-              tags: component.metadata.tags?.join(", ") || "None",
+              tags: this.getEntityTags(component),
             },
           ];
         }
@@ -91,7 +91,7 @@ export class AccessKeyCollector extends BaseCollector {
       .map((entity) => ({
         entity,
         keys: this.collectKeys(entity),
-        tags: entity.metadata.tags?.join(", "),
+        tags: this.getEntityTags(entity),
       }));
   }
 
@@ -113,7 +113,7 @@ export class AccessKeyCollector extends BaseCollector {
               {
                 key: accessKey,
                 owner,
-                tags: accessKey.metadata.tags?.join(", ") || "None",
+                tags: this.getEntityTags(accessKey),
               },
             ];
           }

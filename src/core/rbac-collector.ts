@@ -65,7 +65,7 @@ export class RbacCollector extends BaseCollector {
               title: component.metadata.title || component.metadata.name,
               component,
               contracts,
-              tags: component.metadata.tags?.join(", ") || "None",
+              tags: this.getEntityTags(component),
             },
           ];
         }
@@ -93,7 +93,7 @@ export class RbacCollector extends BaseCollector {
         entity,
         admins: this.collectAdmins(entity),
         roles: this.collectRoles(entity),
-        tags: entity.metadata.tags?.join(", "),
+        tags: this.getEntityTags(entity),
       }));
   }
 
