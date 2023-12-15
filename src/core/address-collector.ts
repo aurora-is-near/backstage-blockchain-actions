@@ -14,7 +14,9 @@ export class AddressCollector extends BaseCollector {
           (entity.spec?.type === "signer-address" ||
             entity.spec?.type?.toString().includes("-address")) &&
           (opts.lifecycle ? entity.spec?.lifecycle === opts.lifecycle : true) &&
-          (opts.scope ? entity.spec?.owner === opts.scope : true),
+          (opts.scope
+            ? entity.spec?.owner?.toString().includes(opts.scope)
+            : true),
       )
       .reduce<AddressInfo[]>((acc, signer) => {
         const contracts = signer
