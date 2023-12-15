@@ -1,5 +1,12 @@
 # backstage-blockchain-actions
 
+## 1.0.15
+
+### Patch Changes
+
+- c714401: refactor: tag abstraction and template changes
+- 85038af: refactor: reverse eoa strategy
+
 ## 1.0.14
 
 ### Patch Changes
