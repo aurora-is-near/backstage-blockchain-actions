@@ -9,14 +9,14 @@
     {{/if}}
 
     {{#each components~}}
-        ### [{{component.metadata.name}}]({{backstageLink component}}) (Tags: {{tags}})
+        ### [{{component.metadata.name}}]({{backstageLink component}}) (`{{tags}}`)
 
         {{#if component.metadata.description~}}
             {{component.metadata.description}}
         {{/if}}
 
         {{#each contracts~}}
-            #### [{{entity.metadata.title}}]({{backstageLink entity}}) (Tags: {{tags}})
+            #### [{{entity.metadata.title}}]({{backstageLink entity}}) (`{{tags}}`)
 
             {{#if entity.metadata.description~}}
                 {{entity.metadata.description}}

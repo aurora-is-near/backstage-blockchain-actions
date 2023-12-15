@@ -77,7 +77,7 @@ export class MultisigsCollector extends BaseCollector {
             title: component.metadata.title || component.metadata.name,
             component,
             multisigs: this.collectMultisigs(componentRef),
-            tags: component.metadata.tags?.join(", ") || "None",
+            tags: this.getEntityTags(component),
           },
         ];
       }, [])
@@ -98,7 +98,7 @@ export class MultisigsCollector extends BaseCollector {
       .map((entity) => ({
         entity: entity,
         signers: this.collectSigners(entity),
-        tags: entity.metadata.tags?.join(", "),
+        tags: this.getEntityTags(entity),
       }));
   }
 
@@ -115,7 +115,7 @@ export class MultisigsCollector extends BaseCollector {
         return {
           signer,
           owner,
-          tags: signer.metadata.tags?.join(", ") || "None",
+          tags: this.getEntityTags(signer),
         };
       })
       .sort((a, b) =>
