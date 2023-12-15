@@ -28,6 +28,7 @@ export type ContractInfo = {
   keys?: KeyInfo[];
   admins?: AdminInfo[];
   roles?: RoleInfo[];
+  addresses?: SignerInfo[];
   tags?: string;
 };
 
@@ -60,6 +61,13 @@ export type SignerInfo = OwnedEntity<{
   signer: Entity;
   keys?: Entity[];
   tags?: string;
+}>;
+
+export type AddressInfo = OwnedEntity<{
+  signer: Entity;
+  keys?: Entity[];
+  roles?: Entity[];
+  contracts?: Entity[];
 }>;
 
 type OwnedEntity<T> = {

@@ -1,44 +1,53 @@
 import { BaseCollector } from "./base-collector";
-import { CollectorOptions, SignerInfo } from "../types";
+import { AddressInfo, CollectorOptions } from "../types";
 import {
-  Entity,
-  RELATION_API_CONSUMED_BY,
-  parseEntityRef,
+  RELATION_CONSUMES_API,
+  RELATION_MEMBER_OF,
+  RELATION_OWNER_OF,
 } from "@backstage/catalog-model";
 
 export class AddressCollector extends BaseCollector {
-  collectAddresses(opts: CollectorOptions): SignerInfo[] {
-    const entities = opts.scope
-      ? this.getResourceEntities().filter(
-          (e) =>
-            e.relations &&
-            e.relations.some((r) => r.targetRef.includes(opts.scope!)),
-        )
-      : this.getResourceEntities();
-    return entities
-      .filter((e) => e.spec?.type === "signer-address")
-      .map((signer) => {
-        const owner = this.entityCatalog[signer.spec!.owner!.toString()];
-        return {
-          signer,
-          owner,
-          keys: this.collectKeys(signer),
-        };
-      })
-      .sort((a, b) => this.sortByName(a.signer, b.signer));
-  }
-
-  collectKeys(contract: Entity): Entity[] {
-    return contract
-      .relations!.filter(
-        (r) =>
-          r.type === RELATION_API_CONSUMED_BY &&
-          parseEntityRef(r.targetRef).kind === "resource",
+  collectAddresses(opts: CollectorOptions): AddressInfo[] {
+    return this.getResourceEntities()
+      .filter(
+        (entity) =>
+          (entity.spec?.type === "signer-address" ||
+            entity.spec?.type?.toString().includes("-address")) &&
+          (opts.lifecycle ? entity.spec?.lifecycle === opts.lifecycle : true) &&
+          (opts.scope
+            ? entity.spec?.owner?.toString().includes(opts.scope)
+            : true),
       )
-      .reduce<Entity[]>((acc, r) => {
-        const accessKey = this.entityCatalog[r.targetRef];
-        return [...acc, accessKey];
+      .reduce<AddressInfo[]>((acc, signer) => {
+        const contracts = signer
+          .relations!.filter(
+            (relation) =>
+              relation.type === RELATION_CONSUMES_API &&
+              this.entityCatalog[relation.targetRef].spec?.type ===
+                "contract-deployment",
+          )
+          .map((relation) => this.entityCatalog[relation.targetRef]);
+        const roles = signer
+          .relations!.filter(
+            (relation) =>
+              relation.type === RELATION_MEMBER_OF &&
+              this.entityCatalog[relation.targetRef].spec?.type ===
+                "role-group",
+          )
+          .map((relation) => this.entityCatalog[relation.targetRef]);
+        const keys = signer
+          .relations!.filter(
+            (relation) =>
+              relation.type === RELATION_OWNER_OF &&
+              this.entityCatalog[relation.targetRef].spec?.type ===
+                "access-key",
+          )
+          .map((relation) => this.entityCatalog[relation.targetRef]);
+        return [...acc, { signer, contracts, roles, keys }];
       }, [])
-      .sort((a, b) => this.sortByName(a, b));
+      .filter(
+        (info) =>
+          info.keys?.length || info.contracts?.length || info.roles?.length,
+      );
   }
 }

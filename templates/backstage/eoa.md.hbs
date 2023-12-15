@@ -7,16 +7,36 @@
 {{signer.metadata.description}}
 
 {{/if}}
-{{#if keys}}
-##### Access Keys
 
-{{#each keys}}
-- ([{{this.metadata.name}}]({{backstageLink this}}))
+{{#if contracts}}
+#### Contracts
+
+{{#each contracts}}
+- [{{this.metadata.title}}]({{backstageLink this}})
 {{/each}}
 
 {{/if}}
+
+{{#if keys}}
+#### Keys
+
+{{#each keys}}
+- [{{this.metadata.title}}]({{backstageLink this}})
+{{/each}}
+
+{{/if}}
+
+{{#if roles}}
+#### Roles
+
+{{#each roles}}
+- [{{this.metadata.title}}]({{backstageLink this}})
+{{/each}}
+
+{{/if}}
+
 {{#if signer.metadata.links}}
-##### External Links
+###### External Links
 
 {{#each signer.metadata.links}}
 - [{{title}}]({{url}})
