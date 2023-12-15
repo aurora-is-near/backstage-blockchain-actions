@@ -32,7 +32,7 @@ export class BaseCollector {
   }
 
   getEntityTags(entity: Entity): string {
-    return entity.metadata.tags?.join(' ') || 'None';
+    return entity.metadata.tags?.join(" ") || "None";
   }
 
   sortByName(a: Entity, b: Entity) {
