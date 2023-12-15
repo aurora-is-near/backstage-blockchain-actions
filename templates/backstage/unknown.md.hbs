@@ -9,7 +9,7 @@
 {{/if}}
 
 {{#each components~}}
-### [{{title}}]({{backstageLink component}})
+### [{{title}}]({{backstageLink component}}) (`{{tags}}`)
 
 {{#if component.metadata.description}}
 {{component.metadata.description}}
@@ -18,7 +18,7 @@
 
 {{#if contracts}}
 {{#each contracts}}
-#### [{{entity.metadata.title}}]({{backstageLink entity}})
+#### [{{entity.metadata.title}}]({{backstageLink entity}}) (`{{tags}}`)
 
 {{#if entity.metadata.description}}
 {{entity.metadata.description}}
@@ -29,7 +29,7 @@
 ##### Access Keys
 
 {{#each keys}}
-- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}}))
+- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}})) (`{{tags}}`)
 {{/each}}
 {{/if}}
 
@@ -65,7 +65,7 @@
 
 {{#if multisigs}}
 {{#each multisigs}}
-#### [{{entity.metadata.title}}]({{backstageLink entity}})
+#### [{{entity.metadata.title}}]({{backstageLink entity}}) (`{{tags}}`)
 
 {{#if entity.metadata.description}}
 {{entity.metadata.description}}
@@ -75,7 +75,7 @@
 ##### Signers
 
 {{#each signers}}
-- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{signer.metadata.name}}]({{backstageLink signer}}))
+- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{signer.metadata.name}}]({{backstageLink signer}})) (`{{tags}}`)
 {{/each}}
 {{/if}}
 {{#if entity.metadata.links}}

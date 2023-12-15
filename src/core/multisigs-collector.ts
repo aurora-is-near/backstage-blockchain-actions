@@ -37,37 +37,50 @@ export class MultisigsCollector extends BaseCollector {
         if (opts.scope && system.spec?.owner !== opts.scope) {
           return acc;
         }
-        const components = this.collectComponents(system);
+        const components = this.collectComponents(system, opts);
 
-        return [
-          ...acc,
-          {
-            title: system.metadata.title || system.metadata.name,
-            system,
-            components,
-          },
-        ];
+        if (components.some((c) => c.multisigs?.length)) {
+          return [
+            ...acc,
+            {
+              title: system.metadata.title || system.metadata.name,
+              system,
+              components,
+            },
+          ];
+        }
+        return acc;
       }, [])
       .sort((a, b) =>
         a.system.metadata.name.localeCompare(b.system.metadata.name),
       );
   }
 
-  collectComponents(system: Entity): ComponentInfo[] {
+  collectComponents(
+    system: Entity,
+    opts: CollectorOptions = {},
+  ): ComponentInfo[] {
     const componentRefs = system.relations!.filter(
       (r) =>
         r.type === RELATION_HAS_PART &&
         parseEntityRef(r.targetRef).kind === "component",
     );
     return componentRefs
-      .map((componentRef) => {
+      .reduce<ComponentInfo[]>((acc, componentRef) => {
         const component = this.entityCatalog[componentRef.targetRef];
-        return {
-          title: component.metadata.title || component.metadata.name,
-          component,
-          multisigs: this.collectMultisigs(componentRef),
-        };
-      })
+        if (opts.lifecycle && component.spec?.lifecycle !== opts.lifecycle) {
+          return acc;
+        }
+        return [
+          ...acc,
+          {
+            title: component.metadata.title || component.metadata.name,
+            component,
+            multisigs: this.collectMultisigs(componentRef),
+            tags: this.getEntityTags(component),
+          },
+        ];
+      }, [])
       .sort((a, b) =>
         a.component.metadata.name.localeCompare(b.component.metadata.name),
       );
@@ -82,9 +95,10 @@ export class MultisigsCollector extends BaseCollector {
             r.targetRef === componentRef.targetRef,
         ),
       )
-      .map((ms) => ({
-        entity: ms,
-        signers: this.collectSigners(ms),
+      .map((entity) => ({
+        entity: entity,
+        signers: this.collectSigners(entity),
+        tags: this.getEntityTags(entity),
       }));
   }
 
@@ -101,6 +115,7 @@ export class MultisigsCollector extends BaseCollector {
         return {
           signer,
           owner,
+          tags: this.getEntityTags(signer),
         };
       })
       .sort((a, b) =>

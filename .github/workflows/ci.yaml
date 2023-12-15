@@ -24,6 +24,7 @@ jobs:
       - name: Create output directories
         run: |
           mkdir -p tmp/backstage/scoped
+          mkdir -p tmp/backstage/lifecycle
       - run: pnpm test
         env:
           BACKSTAGE_URL: ${{ secrets.BACKSTAGE_URL }}

@@ -22,7 +22,7 @@ export class AccessKeyCollector extends BaseCollector {
         return acc;
       }
 
-      const components = this.collectComponents(system);
+      const components = this.collectComponents(system, opts);
 
       if (components.some((c) => c.contracts?.length)) {
         return [
@@ -38,7 +38,10 @@ export class AccessKeyCollector extends BaseCollector {
     }, []);
   }
 
-  collectComponents(system: Entity): ComponentInfo[] {
+  collectComponents(
+    system: Entity,
+    opts: CollectorOptions = {},
+  ): ComponentInfo[] {
     const componentRefs = system.relations!.filter(
       (r) =>
         r.type === RELATION_HAS_PART &&
@@ -47,6 +50,10 @@ export class AccessKeyCollector extends BaseCollector {
     return componentRefs
       .reduce<ComponentInfo[]>((acc, componentRef) => {
         const component = this.entityCatalog[componentRef.targetRef];
+        if (opts.lifecycle && component.spec?.lifecycle !== opts.lifecycle) {
+          return acc;
+        }
+
         const contracts = this.collectContracts(componentRef).filter(
           (c) => c.keys && c.keys.length > 0,
         );
@@ -57,6 +64,7 @@ export class AccessKeyCollector extends BaseCollector {
               title: component.metadata.title || component.metadata.name,
               component,
               contracts,
+              tags: this.getEntityTags(component),
             },
           ];
         }
@@ -83,6 +91,7 @@ export class AccessKeyCollector extends BaseCollector {
       .map((entity) => ({
         entity,
         keys: this.collectKeys(entity),
+        tags: this.getEntityTags(entity),
       }));
   }
 
@@ -99,7 +108,14 @@ export class AccessKeyCollector extends BaseCollector {
           const ownerRef = parseEntityRef(accessKey.spec.owner as string);
           const owner = this.entityCatalog[stringifyEntityRef(ownerRef)];
           if (owner) {
-            return [...acc, { key: accessKey, owner }];
+            return [
+              ...acc,
+              {
+                key: accessKey,
+                owner,
+                tags: this.getEntityTags(accessKey),
+              },
+            ];
           }
         }
         return acc;

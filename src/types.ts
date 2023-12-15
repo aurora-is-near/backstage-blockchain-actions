@@ -2,6 +2,7 @@ import { Entity } from "@backstage/catalog-model";
 
 export type CollectorOptions = {
   scope?: string;
+  lifecycle?: string;
 };
 
 export type EntityCatalog = {
@@ -19,18 +20,27 @@ export type ComponentInfo = {
   component: Entity;
   contracts?: ContractInfo[];
   multisigs?: MultisigInfo[];
+  tags?: string;
 };
 
 export type ContractInfo = {
   entity: Entity;
   keys?: KeyInfo[];
+  admins?: AdminInfo[];
   roles?: RoleInfo[];
   addresses?: SignerInfo[];
+  tags?: string;
 };
 
 export type MultisigInfo = {
   entity: Entity;
   signers: SignerInfo[];
+  tags?: string;
+};
+
+export type AdminInfo = {
+  adminRole: Entity;
+  members: MemberInfo[];
 };
 
 export type RoleInfo = {
@@ -44,11 +54,13 @@ export type MemberInfo = OwnedEntity<{
 
 export type KeyInfo = OwnedEntity<{
   key: Entity;
+  tags?: string;
 }>;
 
 export type SignerInfo = OwnedEntity<{
   signer: Entity;
   keys?: Entity[];
+  tags?: string;
 }>;
 
 export type AddressInfo = OwnedEntity<{

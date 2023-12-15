@@ -9,14 +9,14 @@
     {{/if}}
 
     {{#each components~}}
-        ### [{{title}}]({{backstageLink component}})
+        ### [{{title}}]({{backstageLink component}}) (`{{tags}}`)
 
         {{#if component.metadata.description~}}
             {{component.metadata.description}}
         {{/if}}
 
         {{#each contracts~}}
-            #### [{{entity.metadata.title}}]({{backstageLink entity}})
+            #### [{{entity.metadata.title}}]({{backstageLink entity}}) (`{{tags}}`)
 
             {{#if entity.metadata.description~}}
                 {{entity.metadata.description}}
@@ -26,7 +26,7 @@
                 ##### Keys
 
                 {{#each keys~}}
-                    - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}}))
+                    - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}})) (`{{tags}}`)
                 {{/each}}
             {{/if}}
 

@@ -9,14 +9,14 @@
     {{/if}}
 
     {{#each components~}}
-        ### [{{component.metadata.name}}]({{backstageLink component}})
+        ### [{{component.metadata.name}}]({{backstageLink component}}) (`{{tags}}`)
 
         {{#if component.metadata.description~}}
             {{component.metadata.description}}
         {{/if}}
 
         {{#each contracts~}}
-            #### [{{entity.metadata.title}}]({{backstageLink entity}})
+            #### [{{entity.metadata.title}}]({{backstageLink entity}}) (`{{tags}}`)
 
             {{#if entity.metadata.description~}}
                 {{entity.metadata.description}}
@@ -24,6 +24,23 @@
 
             {{#if roles~}}
                 ##### Roles
+
+                {{#if admins~}}
+                    ###### Admins
+
+                    {{#each admins~}}
+                        {{#if adminRole.metadata.title~}}
+                            [{{adminRole.metadata.title}}]({{backstageLink adminRole}})
+                        {{/if}}
+
+                        {{#if members~}}
+                            {{#each members~}}
+                                - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{member.metadata.title}}]({{backstageLink member}}))
+                            {{/each}}
+                        {{/if}}
+
+                    {{/each}}
+                {{/if}}
 
                 {{#each roles~}}
                     {{#if role.metadata.title~}}

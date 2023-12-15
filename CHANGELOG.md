@@ -1,5 +1,29 @@
 # backstage-blockchain-actions
 
+## 1.0.14
+
+### Patch Changes
+
+- b731c73: feat: add tags to keys in reports
+
+## 1.0.13
+
+### Patch Changes
+
+- 89d541e: feat: add tags to reports
+
+## 1.0.12
+
+### Patch Changes
+
+- e24c458: feat: add lifecycle workflow input
+
+## 1.0.11
+
+### Patch Changes
+
+- 801c2f3: feat: add super admins to rbac report
+
 ## 1.0.10
 
 ### Patch Changes
