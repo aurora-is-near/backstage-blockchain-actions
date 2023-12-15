@@ -1,4 +1,5 @@
 import {
+  RELATION_API_PROVIDED_BY,
   RELATION_OWNED_BY,
   RELATION_HAS_PART,
   parseEntityRef,
@@ -14,26 +15,9 @@ import {
 } from "../types";
 
 export class MultisigsCollector extends BaseCollector {
-  private multisigs: Entity[] = [];
-
-  constructor(entities: Entity[]) {
-    super(entities);
-    this.multisigs = this.getApiEntities().filter(
-      (item) => item.spec?.type === "multisig-deployment",
-    );
-  }
-
-  normalizeEntities(list: string[]) {
-    return [...new Set(list)].sort((a, b) => a.localeCompare(b));
-  }
-
   collectSystems(opts: CollectorOptions): SystemInfo[] {
-    const systemRefs = this.normalizeEntities(
-      this.multisigs.map((item) => item.spec!.system! as string),
-    );
-    return systemRefs
-      .reduce<SystemInfo[]>((acc, systemRef) => {
-        const system = this.entityCatalog[systemRef];
+    return this.getSystemEntities()
+      .reduce<SystemInfo[]>((acc, system) => {
         if (opts.scope && system.spec?.owner !== opts.scope) {
           return acc;
         }
@@ -51,9 +35,7 @@ export class MultisigsCollector extends BaseCollector {
         }
         return acc;
       }, [])
-      .sort((a, b) =>
-        a.system.metadata.name.localeCompare(b.system.metadata.name),
-      );
+      .sort((a, b) => this.sortByName(a.system, b.system));
   }
 
   collectComponents(
@@ -71,27 +53,31 @@ export class MultisigsCollector extends BaseCollector {
         if (opts.lifecycle && component.spec?.lifecycle !== opts.lifecycle) {
           return acc;
         }
-        return [
-          ...acc,
-          {
-            title: component.metadata.title || component.metadata.name,
-            component,
-            multisigs: this.collectMultisigs(componentRef),
-            tags: this.getEntityTags(component),
-          },
-        ];
+
+        const multisigs = this.collectMultisigs(componentRef);
+        if (multisigs.length) {
+          return [
+            ...acc,
+            {
+              title: component.metadata.title || component.metadata.name,
+              component,
+              multisigs,
+              tags: this.getEntityTags(component),
+            },
+          ];
+        }
+        return acc;
       }, [])
-      .sort((a, b) =>
-        a.component.metadata.name.localeCompare(b.component.metadata.name),
-      );
+      .sort((a, b) => this.sortByName(a.component, b.component));
   }
 
   collectMultisigs(componentRef: EntityRelation): MultisigInfo[] {
-    return this.multisigs
+    return this.getApiEntities()
       .filter((item) =>
         item.relations!.some(
           (r) =>
-            r.type === "apiProvidedBy" &&
+            item.spec?.type === "multisig-deployment" &&
+            r.type === RELATION_API_PROVIDED_BY &&
             r.targetRef === componentRef.targetRef,
         ),
       )
@@ -118,8 +104,6 @@ export class MultisigsCollector extends BaseCollector {
           tags: this.getEntityTags(signer),
         };
       })
-      .sort((a, b) =>
-        a.owner.metadata.name.localeCompare(b.owner.metadata.name),
-      );
+      .sort((a, b) => this.sortByName(a.owner, b.owner));
   }
 }
