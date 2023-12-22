@@ -1,5 +1,12 @@
 # backstage-blockchain-actions
 
+## 1.0.16
+
+### Patch Changes
+
+- fe73acd: fix: access key collection filter specificity
+- 3bad1e9: refactor: stateless multisig collector
+
 ## 1.0.15
 
 ### Patch Changes
