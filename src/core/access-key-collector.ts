@@ -100,7 +100,8 @@ export class AccessKeyCollector extends BaseCollector {
       .relations!.filter(
         (r) =>
           r.type === RELATION_API_CONSUMED_BY &&
-          parseEntityRef(r.targetRef).kind === "resource",
+          parseEntityRef(r.targetRef).kind === "resource" &&
+          this.entityCatalog[r.targetRef].spec?.type === "access-key",
       )
       .reduce<KeyInfo[]>((acc, r) => {
         const accessKey = this.entityCatalog[r.targetRef];
