@@ -28,8 +28,8 @@ export class UnknownCollector {
                   ...component,
                   multisigs:
                     component.multisigs &&
-                    component.multisigs.filter((m) =>
-                      m.signers.some(
+                    component.multisigs.filter((multisig) =>
+                      multisig.signers.some(
                         (info) => info.signer.metadata.namespace === "stub",
                       ),
                     ),
@@ -65,9 +65,9 @@ export class UnknownCollector {
                     component.contracts.filter(
                       (contract) =>
                         contract.roles &&
-                        contract.roles.some((info) =>
-                          info.members.some(
-                            (m) => m.member.metadata.namespace === "stub",
+                        contract.roles.some((role) =>
+                          role.members.some(
+                            (info) => info.member.metadata.namespace === "stub",
                           ),
                         ),
                     ),
@@ -79,9 +79,9 @@ export class UnknownCollector {
                   component.contracts.some(
                     (contract) =>
                       contract.roles &&
-                      contract.roles.some((info) =>
-                        info.members.some(
-                          (m) => m.member?.metadata.namespace === "stub",
+                      contract.roles.some((role) =>
+                        role.members.some(
+                          (info) => info.member.metadata.namespace === "stub",
                         ),
                       ),
                   ),
@@ -105,7 +105,7 @@ export class UnknownCollector {
                   (contract) =>
                     contract.keys &&
                     contract.keys.some(
-                      (key) => key.key.metadata.namespace === "stub",
+                      (info) => info.key.metadata.namespace === "stub",
                     ),
                 ),
             ),
