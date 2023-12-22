@@ -7,7 +7,7 @@ describe("backstage-export", () => {
     const result = await backstageExport({
       backstage_url: process.env.BACKSTAGE_URL,
       template_path: "templates/backstage",
-      output_path: "tmp/backstage",
+      output_path: "tmp/backstage/all",
       testing: true,
     });
     expect(result).toBeTruthy();

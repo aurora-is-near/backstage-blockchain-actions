@@ -23,6 +23,7 @@ jobs:
       - run: pnpm type-check
       - name: Create output directories
         run: |
+          mkdir -p tmp/backstage/all
           mkdir -p tmp/backstage/scoped
           mkdir -p tmp/backstage/lifecycle
       - run: pnpm test
