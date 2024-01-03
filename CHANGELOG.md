@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.17
+
+### Patch Changes
+
+- c008d7f: refactor: format tags
+
 ## 1.0.16
 
 ### Patch Changes
