@@ -9,14 +9,14 @@
     {{/if}}
 
     {{#each components~}}
-        ### [{{component.metadata.title}}]({{backstageLink component}}) (`{{tags}}`)
+        ### [{{component.metadata.title}}]({{backstageLink component}}){{#each tags}} `{{this}}`{{/each}}
 
         {{#if component.metadata.description~}}
             {{component.metadata.description}}
         {{/if}}
 
         {{#each multisigs~}}
-            #### [{{entity.metadata.title}}]({{backstageLink entity}}) (`{{tags}}`)
+            #### [{{entity.metadata.title}}]({{backstageLink entity}}){{#each tags}} `{{this}}`{{/each}}
 
             {{#if entity.metadata.description~}}
                 {{entity.metadata.description}}
@@ -38,7 +38,7 @@
                 ##### Signers
 
                 {{#each signers~}}
-                    - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{signer.metadata.name}}]({{backstageLink signer}})) (`{{tags}}`)
+                    - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{signer.metadata.name}}]({{backstageLink signer}})){{#each tags}} `{{this}}`{{/each}}
                 {{/each}}
             {{/if}}
 
