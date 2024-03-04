@@ -20,6 +20,9 @@ inputs:
   output_path:
     description: "Handlebars Template Output Path"
     required: false
+  github_token:
+    description: "The github token"
+    required: false
 
 outputs:
   output:

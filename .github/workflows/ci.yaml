@@ -29,3 +29,4 @@ jobs:
       - run: pnpm test
         env:
           BACKSTAGE_URL: ${{ secrets.BACKSTAGE_URL }}
+          BACKSTAGE_ENTITIES_REPO: ${{ secrets.BACKSTAGE_ENTITIES_REPO }}
