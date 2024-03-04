@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.18
+
+### Patch Changes
+
+- d731b5a: feat: add component matrix workflow
+
 ## 1.0.17
 
 ### Patch Changes
