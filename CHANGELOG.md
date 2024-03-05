@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.19
+
+### Patch Changes
+
+- ca90409: refactor: remove commiting in export
+
 ## 1.0.18
 
 ### Patch Changes
