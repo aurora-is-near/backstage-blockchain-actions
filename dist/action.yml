@@ -1,0 +1,37 @@
+name: Backstage Actions
+description: "A suite of Backstage workflows"
+inputs:
+  helper:
+    description: "The helper workflow to invoke"
+    required: true
+  backstage_url:
+    description: "Backstage URL - url of Backstage backend"
+    required: false
+  backstage_entities_repo:
+    description: "Backstage Entities repository - fallback for the URL endpoint"
+    required: false
+  scope:
+    description: "Group or User entity name to filter by ownership of entities"
+  lifecycle:
+    description: "Spec lifecycle name to filter entities by"
+  template_path:
+    description: "Handlebars Template Path"
+    required: false
+  output_path:
+    description: "Handlebars Template Output Path"
+    required: false
+  github_token:
+    description: "The github token"
+    required: false
+
+outputs:
+  output:
+    description: "The output of the helper"
+
+runs:
+  using: "node16"
+  main: "dist/index.js"
+
+branding:
+  icon: user-check
+  color: purple
