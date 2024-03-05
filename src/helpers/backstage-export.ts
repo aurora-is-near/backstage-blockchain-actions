@@ -2,7 +2,6 @@ import * as core from "@actions/core";
 import { sync } from "glob";
 import type { Entity } from "@backstage/catalog-model";
 import fs from "fs";
-import { simpleGit } from "simple-git";
 import handlebars from "handlebars";
 
 import { MultisigsCollector } from "../core/multisigs-collector";
@@ -94,18 +93,14 @@ export const backstageExport = async ({
     [],
   );
 
-  if (testing) {
-    core.info(`Testing mode: ${changedFiles.length} changed files, exiting`);
-    return true;
+  const hasChangedFiles = changedFiles.length !== 0;
+  if (hasChangedFiles) {
+    core.info(`${changedFiles.length} changed files`);
+  } else {
+    core.info("No changed files");
   }
 
-  if (changedFiles.length === 0) {
-    core.info("No changed files, nothing to commit");
-    return false;
-  }
-
-  await commitAndPushChanges(output_path);
-  return true;
+  return hasChangedFiles;
 };
 
 function reexportTemplate(
@@ -145,16 +140,4 @@ function reexportTemplate(
     return true;
   }
   return false;
-}
-
-async function commitAndPushChanges(path: string) {
-  const git = simpleGit(".");
-  await git.addConfig("user.email", "security@aurora.dev");
-  await git.addConfig("user.name", "Backstage Exporter");
-  await git.add(path);
-  const msg = "chore(backstage): 🥷🏽 automatic re-export";
-  await git.commit(msg, undefined);
-  await git.push();
-  core.info("Updated and pushed the changes");
-  return true;
 }
