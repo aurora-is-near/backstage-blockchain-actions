@@ -1,77 +1,73 @@
 # Unknown Entities
-
 {{#each unknownSystemComponents}}
 
 ## [{{title}}]({{backstageLink system}})
-
 {{#if system.metadata.description}}
+
 {{system.metadata.description}}
 {{/if}}
+{{#each components}}
 
-{{#each components~}}
 ### [{{title}}]({{backstageLink component}}){{#each tags}} `{{this}}`{{/each}}
-
 {{#if component.metadata.description}}
+
 {{component.metadata.description}}
-
 {{/if}}
-
 {{#if contracts}}
 {{#each contracts}}
+
 #### [{{entity.metadata.title}}]({{backstageLink entity}}){{#each tags}} `{{this}}`{{/each}}
-
 {{#if entity.metadata.description}}
+
 {{entity.metadata.description}}
-
 {{/if}}
-
 {{#if keys}}
+
 ##### Access Keys
 
 {{#each keys}}
 - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}})){{#each tags}} `{{this}}`{{/each}}
 {{/each}}
 {{/if}}
-
 {{#if roles}}
+
 ##### Role Groups
 
 {{#each roles}}
 {{#if role.metadata.title}}
-##### [{{role.metadata.title}}]({{backstageLink role}})
 
+##### [{{role.metadata.title}}]({{backstageLink role}})
 {{/if}}
 {{#if members}}
+
 ##### Members
 
 {{#each members}}
 - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{member.metadata.title}}]({{backstageLink member}}))
 {{/each}}
-
 {{/if}}
 {{/each}}
 {{/if}}
-
 {{#if entity.metadata.links}}
+
 ##### External Links
 
 {{#each entity.metadata.links}}
 - [{{title}}]({{url}})
 {{/each}}
 {{/if}}
-
 {{/each}}
 {{/if}}
-
 {{#if multisigs}}
 {{#each multisigs}}
+
 #### [{{entity.metadata.title}}]({{backstageLink entity}}){{#each tags}} `{{this}}`{{/each}}
-
 {{#if entity.metadata.description}}
-{{entity.metadata.description}}
 
+{{entity.metadata.description}}
 {{/if}}
 {{#if signers}}
+
 ##### Signers
 
 {{#each signers}}
@@ -79,6 +75,7 @@
 {{/each}}
 {{/if}}
 {{#if entity.metadata.links}}
+
 ##### External Links
 
 {{#each entity.metadata.links}}
@@ -87,6 +84,5 @@
 {{/if}}
 {{/each}}
 {{/if}}
-
 {{/each}}
 {{/each}}

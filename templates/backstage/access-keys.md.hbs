@@ -1,43 +1,41 @@
 # Contracts with Access Keys
+{{#each accessKeySystemComponents}}
 
-{{#each accessKeySystemComponents~}}
+## [{{title}}]({{backstageLink system}})
+{{#if system.metadata.description}}
 
-    ## [{{title}}]({{backstageLink system}})
+{{system.metadata.description}}
+{{/if}}
+{{#each components}}
 
-    {{#if system.metadata.description~}}
-        {{system.metadata.description}}
-    {{/if}}
+### [{{title}}]({{backstageLink component}}){{#each tags}} `{{this}}`{{/each}}
+{{#if component.metadata.description}}
 
-    {{#each components~}}
-        ### [{{title}}]({{backstageLink component}}){{#each tags}} `{{this}}`{{/each}}
+{{component.metadata.description}}
+{{/if}}
+{{#each contracts}}
 
-        {{#if component.metadata.description~}}
-            {{component.metadata.description}}
-        {{/if}}
+#### [{{entity.metadata.title}}]({{backstageLink entity}}){{#each tags}} `{{this}}`{{/each}}
+{{#if entity.metadata.description}}
 
-        {{#each contracts~}}
-            #### [{{entity.metadata.title}}]({{backstageLink entity}}){{#each tags}} `{{this}}`{{/each}}
+{{entity.metadata.description}}
+{{/if}}
+{{#if keys}}
 
-            {{#if entity.metadata.description~}}
-                {{entity.metadata.description}}
-            {{/if}}
+##### Keys
 
-            {{#if keys~}}
-                ##### Keys
+{{#each keys}}
+- [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}})){{#each tags}} `{{this}}`{{/each}}
+{{/each}}
+{{/if}}
+{{#if entity.metadata.links}}
 
-                {{#each keys~}}
-                    - [{{owner.metadata.name}}]({{backstageLink owner}}) ([{{key.metadata.name}}]({{backstageLink key}})) (`{{tags}}`)
-                {{/each}}
-            {{/if}}
+##### External Links
 
-            {{#if entity.metadata.links~}}
-                ##### External Links
-                {{#each entity.metadata.links~}}
-                    - [{{title}}]({{url}})
-                {{/each}}
-            {{/if}}
-
-        {{/each}}
-    {{/each}}
-
+{{#each entity.metadata.links}}
+- [{{title}}]({{url}})
+{{/each}}
+{{/if}}
+{{/each}}
+{{/each}}
 {{/each}}

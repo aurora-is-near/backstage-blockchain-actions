@@ -1,47 +1,41 @@
 # Addresses
+{{#each addresses}}
 
-{{#each addresses~}}
-### [{{signer.metadata.title}}]({{backstageLink signer}})
-
+## [{{signer.metadata.title}}]({{backstageLink signer}})
 {{#if signer.metadata.description}}
+
 {{signer.metadata.description}}
-
 {{/if}}
-
 {{#if contracts}}
-#### Contracts
+
+### Contracts
 
 {{#each contracts}}
 - [{{this.metadata.title}}]({{backstageLink this}})
 {{/each}}
-
 {{/if}}
-
 {{#if keys}}
-#### Keys
+
+### Keys
 
 {{#each keys}}
 - [{{this.metadata.title}}]({{backstageLink this}})
 {{/each}}
-
 {{/if}}
-
 {{#if roles}}
-#### Roles
+
+### Roles
 
 {{#each roles}}
 - [{{this.metadata.title}}]({{backstageLink this}})
 {{/each}}
-
 {{/if}}
-
 {{#if signer.metadata.links}}
-###### External Links
+
+### External Links
 
 {{#each signer.metadata.links}}
 - [{{title}}]({{url}})
 {{/each}}
-
 {{/if}}
-
 {{/each}}
