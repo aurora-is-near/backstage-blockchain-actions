@@ -1,5 +1,12 @@
 # backstage-blockchain-actions
 
+## 1.0.20
+
+### Patch Changes
+
+- 50c8f35: chore: add matrix optional inputs
+- f4a3c1b: chore: use node20
+
 ## 1.0.19
 
 ### Patch Changes
