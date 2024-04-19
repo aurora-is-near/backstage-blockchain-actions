@@ -12,8 +12,16 @@ inputs:
     required: false
   scope:
     description: "Group or User entity name to filter by ownership of entities"
+    required: false
   lifecycle:
     description: "Spec lifecycle name to filter entities by"
+    required: false
+  force_all_checks:
+    description: "Force checks for all PRs even if files were not touched"
+    required: false
+  ignore_failures:
+    description: "Allows tests to fail without blocking PRs"
+    required: false
   template_path:
     description: "Handlebars Template Path"
     required: false
@@ -29,7 +37,7 @@ outputs:
     description: "The output of the helper"
 
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
 
 branding:
