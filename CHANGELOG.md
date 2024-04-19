@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.21
+
+### Patch Changes
+
+- dab6581: chore: revert to node16
+
 ## 1.0.20
 
 ### Patch Changes
