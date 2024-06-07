@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.22
+
+### Patch Changes
+
+- fe2f10a: chore: don't export deployment startBlock
+
 ## 1.0.21
 
 ### Patch Changes
