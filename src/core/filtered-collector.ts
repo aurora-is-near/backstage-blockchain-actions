@@ -10,7 +10,6 @@ const ALLOWED_SPEC_FIELDS = [
   "address",
   "network",
   "networkType",
-  "deployment.source.startBlock",
 ];
 const ALLOWED_METADATA_FIELDS = [
   "uid",
