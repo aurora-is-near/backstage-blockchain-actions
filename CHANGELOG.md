@@ -1,5 +1,12 @@
 # backstage-blockchain-actions
 
+## 1.0.23
+
+### Patch Changes
+
+- 160b7fa: ci: update to node20
+- 3aae729: feat: ignore retired users for contract key count
+
 ## 1.0.22
 
 ### Patch Changes
