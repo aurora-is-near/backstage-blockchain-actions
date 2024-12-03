@@ -2,6 +2,7 @@ import {
   isApiEntity,
   isResourceEntity,
   isSystemEntity,
+  isUserEntity,
   stringifyEntityRef,
 } from "@backstage/catalog-model";
 import type { Entity } from "@backstage/catalog-model";
@@ -29,6 +30,10 @@ export class BaseCollector {
 
   getResourceEntities(): Entity[] {
     return this.entities.filter(isResourceEntity).sort(this.sortByName);
+  }
+
+  getUserEntities(): Entity[] {
+    return this.entities.filter(isUserEntity).sort(this.sortByName);
   }
 
   getEntityTags(entity: Entity): string[] {

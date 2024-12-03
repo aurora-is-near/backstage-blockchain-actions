@@ -503,12 +503,24 @@ function generateContractAccessKeyMetrics(
   collector: MetricsCollector,
   backstageUrl: string,
 ) {
+  const retiredUsers = collector
+    .getUserEntities()
+    .filter(
+      (user) => user.metadata.tags && user.metadata.tags.includes("retired"),
+    );
   const accessKeysPerContract = collector
     .getContractAccessKeys()
     .reduce<KeysByOwner>((acc, key) => {
       // inferred type is JsonObject, this converts to any
       const spec = JSON.parse(JSON.stringify(key.spec));
       const { owner } = spec;
+      if (
+        retiredUsers.find(
+          (user) => `user:default/${user.metadata.name}` === owner,
+        )
+      ) {
+        return { ...acc };
+      }
       return {
         ...acc,
         [owner]: [...(acc[owner] || []), key],
