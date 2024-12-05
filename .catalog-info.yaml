@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage-blockchain-actions
+  description: Enables a commit log of changes made to entities by exporting reports to a GitHub repo and metrics to Datadog
+  tags:
+    - library
+  annotations:
+    aurora.dev/security-tier: "3"
+
+spec:
+  type: library
+  owner: security
+  lifecycle: production
+  system: backstage
