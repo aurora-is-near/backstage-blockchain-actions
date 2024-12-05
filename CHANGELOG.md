@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.24
+
+### Patch Changes
+
+- eba3d25: chore: use native fetch
+
 ## 1.0.23
 
 ### Patch Changes
