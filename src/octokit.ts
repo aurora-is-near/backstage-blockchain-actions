@@ -12,8 +12,8 @@ limitations under the License.
 */
 
 import * as core from "@actions/core";
-import * as fetch from "@adobe/node-fetch-retry";
+// import * as fetch from "@adobe/node-fetch-retry";
 import { getOctokit } from "@actions/github";
 
 const githubToken = core.getInput("github_token", { required: true });
-export const octokit = getOctokit(githubToken, { request: { fetch } }).rest;
+export const octokit = getOctokit(githubToken).rest;
