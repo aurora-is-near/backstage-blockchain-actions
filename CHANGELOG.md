@@ -1,5 +1,13 @@
 # backstage-blockchain-actions
 
+## 1.0.25
+
+### Patch Changes
+
+- efef940: feat: add node component detection
+- 457433e: fix: tagless component processing
+- 5ca6b9e: build: remove fetch wrapper
+
 ## 1.0.24
 
 ### Patch Changes
