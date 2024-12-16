@@ -130,10 +130,12 @@ function componentConfig(
   const isRust =
     item.metadata.tags?.includes("near") || hasInRoot(path, "Cargo.toml");
   const isGo = hasInRoot(path, "go.mod");
+  const isNode = hasInRoot(path, "package.json");
 
   const runSlither = isSolidity && runTests;
   const runClippy = isRust && runTests;
   const runGoStaticChecks = isGo && runTests;
+  const runBiome = isNode && runTests;
 
   // Slither is executed from monorepo's root, not from the "path"
   // with the path passed as a target
@@ -156,6 +158,7 @@ function componentConfig(
     slitherArgs,
     runClippy,
     runGoStaticChecks,
+    runBiome,
     ignoreFailures,
     // backwards compatibility
     allowTestsToFail: ignoreFailures,
