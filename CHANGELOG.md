@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.26
+
+### Patch Changes
+
+- 4926a16: feat: narrow slither and clippy analysis to be file-based
+
 ## 1.0.25
 
 ### Patch Changes
