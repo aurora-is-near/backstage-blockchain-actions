@@ -111,14 +111,6 @@ function inspectComponents(message: string, items: Entity[]) {
   );
 }
 
-function isSolidityItem(item: Entity, path: string) {
-  // Not sure if hasTags is necessary anymore
-  const hasTags = ["ethereum", "aurora"].some(
-    (tag) => item.metadata.tags?.includes(tag),
-  );
-  const hasFiles = hasInRoot(path, "**/*.sol");
-  return hasTags || hasFiles;
-}
 function componentConfig(
   item: Entity,
   runTests: boolean,
@@ -126,9 +118,8 @@ function componentConfig(
 ) {
   const path = sourceLocationDir(item)!;
 
-  const isSolidity = isSolidityItem(item, path);
-  const isRust =
-    item.metadata.tags?.includes("near") || hasInRoot(path, "Cargo.toml");
+  const isSolidity = hasInRoot(path, "**/*.sol");
+  const isRust = hasInRoot(path, "Cargo.toml");
   const isGo = hasInRoot(path, "go.mod");
   const isNode = hasInRoot(path, "package.json");
 
