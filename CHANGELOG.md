@@ -1,5 +1,13 @@
 # backstage-blockchain-actions
 
+## 1.0.26
+
+### Patch Changes
+
+- bc62df9: fix: patch key collection
+- 3aad785: fix: toggle file change detection during testing
+- 4926a16: feat: narrow slither and clippy analysis to be file-based
+
 ## 1.0.25
 
 ### Patch Changes
