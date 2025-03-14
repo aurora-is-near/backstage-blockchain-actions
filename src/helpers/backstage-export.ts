@@ -100,7 +100,7 @@ export const backstageExport = async ({
     core.info("No changed files");
   }
 
-  return hasChangedFiles;
+  return testing ? true : hasChangedFiles;
 };
 
 function reexportTemplate(

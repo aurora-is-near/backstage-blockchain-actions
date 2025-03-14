@@ -97,12 +97,15 @@ export class AccessKeyCollector extends BaseCollector {
 
   collectKeys(contract: Entity): KeyInfo[] {
     return contract
-      .relations!.filter(
-        (r) =>
+      .relations!.filter((r) => {
+        const keyEntity = this.entityCatalog[r.targetRef];
+        return (
           r.type === RELATION_API_CONSUMED_BY &&
           parseEntityRef(r.targetRef).kind === "resource" &&
-          this.entityCatalog[r.targetRef].spec?.type === "access-key",
-      )
+          keyEntity &&
+          keyEntity.spec?.type === "access-key"
+        );
+      })
       .reduce<KeyInfo[]>((acc, r) => {
         const accessKey = this.entityCatalog[r.targetRef];
         if (accessKey && accessKey.spec && accessKey.spec.owner) {
