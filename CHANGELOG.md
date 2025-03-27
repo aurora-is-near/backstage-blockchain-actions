@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.27
+
+### Patch Changes
+
+- 648b5de: fix: existence check for access-key collection
+
 ## 1.0.26
 
 ### Patch Changes
