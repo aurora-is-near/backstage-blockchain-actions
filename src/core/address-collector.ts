@@ -39,6 +39,7 @@ export class AddressCollector extends BaseCollector {
           .relations!.filter(
             (relation) =>
               relation.type === RELATION_OWNER_OF &&
+              this.entityCatalog[relation.targetRef] &&
               this.entityCatalog[relation.targetRef].spec?.type ===
                 "access-key",
           )
