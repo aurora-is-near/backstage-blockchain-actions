@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import "dotenv/config";
 import { generateComponentMatrix } from "../../src/helpers/generate-component-matrix";
 import { octokit } from "../../src/octokit";
 import { CatalogApi, GetEntitiesResponse } from "@backstage/catalog-client";

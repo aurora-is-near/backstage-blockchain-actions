@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { backstageMetrics } from "../../src/helpers/backstage-metrics";
 
 jest.mock("@actions/core");

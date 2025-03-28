@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { backstageExport } from "../../src/helpers/backstage-export";
 
 jest.mock("@actions/core");
