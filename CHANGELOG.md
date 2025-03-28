@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.28
+
+### Patch Changes
+
+- 9d6fd46: fix: export undefined fields
+
 ## 1.0.27
 
 ### Patch Changes
