@@ -23,6 +23,7 @@ export class AddressCollector extends BaseCollector {
           .relations!.filter(
             (relation) =>
               relation.type === RELATION_CONSUMES_API &&
+              this.entityCatalog[relation.targetRef] &&
               this.entityCatalog[relation.targetRef].spec?.type ===
                 "contract-deployment",
           )
@@ -31,6 +32,7 @@ export class AddressCollector extends BaseCollector {
           .relations!.filter(
             (relation) =>
               relation.type === RELATION_MEMBER_OF &&
+              this.entityCatalog[relation.targetRef] &&
               this.entityCatalog[relation.targetRef].spec?.type ===
                 "role-group",
           )
