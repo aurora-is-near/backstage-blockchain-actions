@@ -28,6 +28,10 @@ export async function backstageMetrics({
 
   try {
     const multisigSeries = generateMultisigMetrics(collector, backstage_url);
+    const multisigPolicySeries = generateMultisigPolicyMetrics(
+      collector,
+      backstage_url,
+    );
     const signerSeries = generateSignerMetrics(collector, backstage_url);
     const keySeries = generateAccessKeyMetrics(collector, backstage_url);
     const keyCountByOwnerSeries = generateUserAccessKeyMetrics(
@@ -64,6 +68,7 @@ export async function backstageMetrics({
     }
     const data = await Promise.all([
       submitMetrics(multisigSeries),
+      submitMetrics(multisigPolicySeries),
       submitMetrics(signerSeries),
       submitMetrics(keySeries),
       submitMetrics(keyCountByOwnerSeries),

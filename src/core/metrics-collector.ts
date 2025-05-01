@@ -3,6 +3,7 @@ import {
   parseEntityRef,
 } from "@backstage/catalog-model";
 import type { Entity } from "@backstage/catalog-model";
+import { isMultisigDeployment } from "@aurora-is-near/backstage-plugin-blockchainradar-common";
 import { BaseCollector } from "./base-collector";
 import { CollectorOptions, MultisigInfo, SignerInfo } from "../types";
 import { MultisigsCollector } from "./multisigs-collector";
@@ -64,6 +65,32 @@ export class MetricsCollector extends BaseCollector {
       {},
     );
     return Object.values(uniqueSigners);
+  }
+
+  getMultisigPolicies() {
+    const multisigs = this.getMultisigs();
+    const policies = multisigs.reduce<
+      Array<{ entity: MultisigDeploymentEntity; policy: number }>
+    >((acc, { entity }) => {
+      if (
+        !isMultisigDeployment(entity) ||
+        !entity.spec.multisig ||
+        !entity.spec.multisig.policy
+      ) {
+        return acc;
+      }
+      return [
+        ...acc,
+        {
+          entity,
+          policy:
+            entity.spec.multisig.policy.threshold /
+            (entity.spec.multisig.policy.owners || 1),
+        },
+      ];
+    }, []);
+
+    return policies;
   }
 
   getMultisigAccessKeys(): Entity[] {
@@ -151,16 +178,16 @@ export class MetricsCollector extends BaseCollector {
 
   getDeprecatedAccessKeys(): Entity[] {
     const keys = this.getAllAccessKeys();
-    const deprecated = keys.filter(
-      (entity) => entity.metadata.tags?.includes("deprecated"),
+    const deprecated = keys.filter((entity) =>
+      entity.metadata.tags?.includes("deprecated"),
     );
     return deprecated;
   }
 
   getUnknownAccessKeys(): Entity[] {
     const keys = this.getAllAccessKeys();
-    const unknown = keys.filter(
-      (entity) => entity.metadata.tags?.includes("unknown"),
+    const unknown = keys.filter((entity) =>
+      entity.metadata.tags?.includes("unknown"),
     );
     return unknown;
   }
