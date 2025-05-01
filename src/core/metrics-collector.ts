@@ -1,11 +1,18 @@
 import {
   RELATION_API_CONSUMED_BY,
+  RELATION_API_PROVIDED_BY,
   parseEntityRef,
 } from "@backstage/catalog-model";
 import type { Entity } from "@backstage/catalog-model";
 import {
+  AccessKeyEntity,
+  ContractDeploymentEntity,
   MultisigDeploymentEntity,
+  SignerEntity,
+  isAccessKey,
+  isContractDeployment,
   isMultisigDeployment,
+  isSigner,
 } from "@aurora-is-near/backstage-plugin-blockchainradar-common";
 import { BaseCollector } from "./base-collector";
 import { CollectorOptions, MultisigInfo, SignerInfo } from "../types";
@@ -49,9 +56,18 @@ export class MetricsCollector extends BaseCollector {
   }
 
   getNearContracts() {
-    return this.contracts.filter((entity) => entity.spec?.network === "near");
+    return this.apiEntities
+      .filter(isContractDeployment)
+      .filter((entity) => entity.spec?.network === "near");
   }
 
+  getNearSigners() {
+    return this.resourceEntities
+      .filter(isSigner)
+      .filter((entity) => entity.spec?.network === "near");
+  }
+
+  // to find signers that are part of a multisig council
   getSigners() {
     const allSigners = this.getMultisigs().flatMap((ms) => ms.signers);
     const uniqueSigners = allSigners.reduce<{ [uid: string]: SignerInfo }>(
@@ -120,59 +136,79 @@ export class MetricsCollector extends BaseCollector {
   }
 
   getAccessKeysPerSigner() {
-    const signers = this.getSigners().filter(
-      (value) => value.signer.spec?.network === "near",
-    );
-    const keysPerSigner = signers.reduce<{
-      [s: string]: SignerInfo & { keys: Entity[] };
-    }>((acc, value) => {
-      if (!value.signer.relations) {
+    const signers = this.getNearSigners();
+    const keysPerSigner = signers.reduce<
+      Array<{
+        entity: SignerEntity;
+        keys: AccessKeyEntity[];
+      }>
+    >((acc, entity) => {
+      if (!entity.relations || entity.relations.length === 0) {
         return acc;
       }
-      const spec = JSON.parse(JSON.stringify(value.signer.spec));
-      const signer: string = spec.address;
-      const keys = value.signer.relations
-        .filter(
-          (r) =>
-            r.type === RELATION_API_CONSUMED_BY &&
-            parseEntityRef(r.targetRef).kind === "resource",
-        )
-        .map((relation) => {
-          const key = this.entityCatalog[relation.targetRef];
-          return key;
-        })
-        .filter<Entity>(this.isEntity);
-
-      return {
+      return [
         ...acc,
-        [signer]: {
-          owner: value.owner,
-          signer: value.signer,
-          keys,
+        {
+          entity,
+          keys: entity.relations.reduce<AccessKeyEntity[]>(
+            (accKeys, relation) => {
+              const key = this.entityCatalog[relation.targetRef];
+              if (
+                relation.type !== RELATION_API_CONSUMED_BY ||
+                !key ||
+                !isAccessKey(key)
+              ) {
+                return accKeys;
+              }
+              return [...accKeys, key];
+            },
+            [],
+          ),
         },
-      };
-    }, {});
+      ];
+    }, []);
 
     return keysPerSigner;
   }
 
-  getContractAccessKeys(): Entity[] {
-    const keys = this.contracts.flatMap((value) => {
-      if (!value.relations) {
-        return [];
+  getAccessKeysPerContract() {
+    const contracts = this.getNearContracts();
+    const keysPerContract = contracts.reduce<
+      Array<{
+        entity: ContractDeploymentEntity;
+        component: string | undefined;
+        keys: AccessKeyEntity[];
+      }>
+    >((acc, entity) => {
+      if (!entity.relations || entity.relations.length === 0) {
+        return acc;
       }
-      return value.relations
-        .filter(
-          (r) =>
-            r.type === RELATION_API_CONSUMED_BY &&
-            parseEntityRef(r.targetRef).kind === "resource",
-        )
-        .map((relation) => {
-          const key = this.entityCatalog[relation.targetRef];
-          return key;
-        });
-    });
-    return keys.filter<Entity>(this.isEntity);
+      const component = entity.relations.find(
+        (relation) => relation.type === RELATION_API_PROVIDED_BY,
+      );
+      return [
+        ...acc,
+        {
+          entity,
+          component: component?.targetRef,
+          keys: entity.relations.reduce<AccessKeyEntity[]>(
+            (accKeys, relation) => {
+              const key = this.entityCatalog[relation.targetRef];
+              if (
+                relation.type !== RELATION_API_CONSUMED_BY ||
+                !key ||
+                !isAccessKey(key)
+              ) {
+                return accKeys;
+              }
+              return [...accKeys, key];
+            },
+            [],
+          ),
+        },
+      ];
+    }, []);
+    return keysPerContract;
   }
 
   getAllAccessKeys(): Entity[] {

@@ -1,6 +1,5 @@
 import * as core from "@actions/core";
 import { client, v2 } from "@datadog/datadog-api-client";
-import type { Entity } from "@backstage/catalog-model";
 
 import { MetricsCollector } from "../core/metrics-collector";
 import { getBackstageEntities } from "../utils/get-backstage-entities";
@@ -34,11 +33,11 @@ export async function backstageMetrics({
     );
     const signerSeries = generateSignerMetrics(collector, backstage_url);
     const keySeries = generateAccessKeyMetrics(collector, backstage_url);
-    const keyCountByOwnerSeries = generateUserAccessKeyMetrics(
+    const keysBySignerSeries = generateSignerAccessKeyMetrics(
       collector,
       backstage_url,
     );
-    const keyCountByContractSeries = generateContractAccessKeyMetrics(
+    const keysByContractSeries = generateContractAccessKeyMetrics(
       collector,
       backstage_url,
     );
@@ -71,8 +70,8 @@ export async function backstageMetrics({
       submitMetrics(multisigPolicySeries),
       submitMetrics(signerSeries),
       submitMetrics(keySeries),
-      submitMetrics(keyCountByOwnerSeries),
-      submitMetrics(keyCountByContractSeries),
+      submitMetrics(keysBySignerSeries),
+      submitMetrics(keysByContractSeries),
       submitMetrics(deprecatedKeysSeries),
       submitMetrics(unknownAccessKeysSeries),
       submitMetrics(unknownSignerSeries),
@@ -163,9 +162,7 @@ function generateMultisigPolicyMetrics(
   const series = collector
     .getMultisigPolicies()
     .map<v2.MetricSeries>((multisigPolicyData) => {
-      const { kind, metadata, spec } = multisigPolicyData.entity;
-      const { name } = metadata;
-
+      const { kind, spec } = multisigPolicyData.entity;
       const {
         address,
         network,
@@ -183,7 +180,6 @@ function generateMultisigPolicyMetrics(
           type: "host",
           name: backstageUrl.split("@")[1],
         },
-        { type: "api", name },
         { type: "address", name: address },
         { type: "kind", name: kind },
         { type: "network", name: network },
@@ -518,89 +514,92 @@ function generateUnknownAccessKeyMetrics(
   return series;
 }
 
-function generateUserAccessKeyMetrics(
+function generateSignerAccessKeyMetrics(
   collector: MetricsCollector,
   backstageUrl: string,
 ) {
-  const series = Object.entries(
-    collector.getAccessKeysPerSigner(),
-  ).map<v2.MetricSeries>(([signer, entry]) => {
-    const spec = JSON.parse(JSON.stringify(entry.signer.spec));
-    const { owner } = spec;
-    const ownerName = `${owner}/${signer}`;
-    const resources = [
-      {
-        type: "host",
-        name: backstageUrl.split("@")[1],
-      },
-      { type: "owner", name: ownerName },
-      { type: "user", name: owner },
-      { type: "signer", name: signer },
-    ];
-    const value = entry.keys.length;
-    const timestamp = Math.round(new Date().getTime() / 1000);
-    const points = [{ timestamp, value }];
-    return {
-      metric: "backstage.access_keys_owned_count",
-      type: DATADOG_GAUGE_TYPE,
-      points,
-      resources,
-    };
-  });
-  return series;
-}
+  const series = collector
+    .getAccessKeysPerSigner()
+    .filter((entry) => !entry.entity.metadata.tags?.includes("deprecated"))
+    .map<v2.MetricSeries>(({ entity, keys }) => {
+      const {
+        type,
+        address,
+        network,
+        networkType,
+        owner: rawOwner,
+      } = entity.spec;
+      const owner = rawOwner.split(":")[1];
 
-type KeysByOwner = {
-  [owner: string]: Entity[];
-};
-
-function generateContractAccessKeyMetrics(
-  collector: MetricsCollector,
-  backstageUrl: string,
-) {
-  const retiredUsers = collector
-    .getUserEntities()
-    .filter(
-      (user) => user.metadata.tags && user.metadata.tags.includes("retired"),
-    );
-  const accessKeysPerContract = collector
-    .getContractAccessKeys()
-    .reduce<KeysByOwner>((acc, key) => {
-      // inferred type is JsonObject, this converts to any
-      const spec = JSON.parse(JSON.stringify(key.spec));
-      const { owner } = spec;
-      if (
-        retiredUsers.find(
-          (user) => `user:default/${user.metadata.name}` === owner,
-        )
-      ) {
-        return { ...acc };
-      }
-      return {
-        ...acc,
-        [owner]: [...(acc[owner] || []), key],
-      };
-    }, {});
-  const series = Object.entries(accessKeysPerContract).map<v2.MetricSeries>(
-    ([owner, keys]) => {
       const resources = [
         {
           type: "host",
           name: backstageUrl.split("@")[1],
         },
+        { type: "type", name: type },
+        { type: "address", name: address },
+        { type: "network", name: network },
+        { type: "networkType", name: networkType },
         { type: "owner", name: owner },
       ];
       const value = keys.length;
       const timestamp = Math.round(new Date().getTime() / 1000);
       const points = [{ timestamp, value }];
       return {
-        metric: "backstage.access_keys_by_contract_count",
+        metric: "backstage.signers.access_keys",
         type: DATADOG_GAUGE_TYPE,
         points,
         resources,
       };
-    },
-  );
+    });
+  return series;
+}
+
+function generateContractAccessKeyMetrics(
+  collector: MetricsCollector,
+  backstageUrl: string,
+) {
+  const series = collector
+    .getAccessKeysPerContract()
+    .filter((entry) => !entry.entity.metadata.tags?.includes("deprecated"))
+    .map<v2.MetricSeries>(({ entity, component: rawComponent, keys }) => {
+      const {
+        type,
+        address,
+        network,
+        networkType,
+        system: rawSystem,
+        owner: rawOwner,
+      } = entity.spec;
+      const component = rawComponent ? rawComponent.split(":")[1] : "none";
+      const system = rawSystem ? rawSystem.split(":")[1] : "none";
+      const owner = rawOwner.split(":")[1];
+
+      // this tags timeseries with distinguishing
+      // properties for filtering purposes
+      const resources = [
+        {
+          type: "host",
+          name: backstageUrl.split("@")[1],
+        },
+        { type: "type", name: type },
+        { type: "address", name: address },
+        { type: "network", name: network },
+        { type: "networkType", name: networkType },
+        { type: "component", name: component },
+        { type: "system", name: system },
+        { type: "owner", name: owner },
+      ];
+      const value = keys.length;
+      const timestamp = Math.round(new Date().getTime() / 1000);
+      const points = [{ timestamp, value }];
+      return {
+        metric: "backstage.contracts.access_keys",
+        type: DATADOG_GAUGE_TYPE,
+        points,
+        resources,
+      };
+    });
   return series;
 }
 
