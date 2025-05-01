@@ -11,6 +11,9 @@ dependencies:
   '@actions/github':
     specifier: ^6.0.0
     version: 6.0.0
+  '@aurora-is-near/backstage-plugin-blockchainradar-common':
+    specifier: ^1.0.35
+    version: 1.0.35
   '@backstage/catalog-client':
     specifier: ^1.4.4
     version: 1.4.4
@@ -154,6 +157,10 @@ packages:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.19
     dev: true
+
+  /@aurora-is-near/backstage-plugin-blockchainradar-common@1.0.35:
+    resolution: {integrity: sha512-42GTSW0yqRXGReQSI8ChqpHOX1WqTqrzaEwp2SBKhhi7E8u5F4ZzvtwK+EwRH99bpisFWGQKk/2+m1sPISCx6w==}
+    dev: false
 
   /@babel/code-frame@7.22.13:
     resolution: {integrity: sha512-XktuhWlJ5g+3TJXc5upd9Ks1HutSArik6jf2eAjYFyIOf4ej3RN+184cZbzDvbPnuTJIUhPKKJE3cIsYTiAT3w==}
