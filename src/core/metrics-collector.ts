@@ -3,7 +3,10 @@ import {
   parseEntityRef,
 } from "@backstage/catalog-model";
 import type { Entity } from "@backstage/catalog-model";
-import { isMultisigDeployment } from "@aurora-is-near/backstage-plugin-blockchainradar-common";
+import {
+  MultisigDeploymentEntity,
+  isMultisigDeployment,
+} from "@aurora-is-near/backstage-plugin-blockchainradar-common";
 import { BaseCollector } from "./base-collector";
 import { CollectorOptions, MultisigInfo, SignerInfo } from "../types";
 import { MultisigsCollector } from "./multisigs-collector";
