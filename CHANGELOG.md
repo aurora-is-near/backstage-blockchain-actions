@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.30
+
+### Patch Changes
+
+- c0703cb: feat: improve fidelity of access key metrics
+
 ## 1.0.29
 
 ### Patch Changes
