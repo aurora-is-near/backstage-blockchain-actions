@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.29
+
+### Patch Changes
+
+- cc877c9: feat: implement multisig policy metrics
+
 ## 1.0.28
 
 ### Patch Changes
