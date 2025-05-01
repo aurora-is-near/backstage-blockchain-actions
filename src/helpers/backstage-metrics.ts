@@ -156,6 +156,56 @@ function generateMultisigMetrics(
   return series;
 }
 
+function generateMultisigPolicyMetrics(
+  collector: MetricsCollector,
+  backstageUrl: string,
+) {
+  const series = collector
+    .getMultisigPolicies()
+    .map<v2.MetricSeries>((multisigPolicyData) => {
+      const { kind, metadata, spec } = multisigPolicyData.entity;
+      const { name } = metadata;
+
+      const {
+        address,
+        network,
+        networkType,
+        system: rawSystem,
+        owner: rawOwner,
+      } = spec;
+      const system = rawSystem ? rawSystem.split(":")[1] : "none";
+      const owner = rawOwner.split(":")[1];
+
+      // this tags timeseries with distinguishing
+      // properties for filtering purposes
+      const resources = [
+        {
+          type: "host",
+          name: backstageUrl.split("@")[1],
+        },
+        { type: "api", name },
+        { type: "address", name: address },
+        { type: "kind", name: kind },
+        { type: "network", name: network },
+        { type: "networkType", name: networkType },
+        { type: "system", name: system },
+        { type: "owner", name: owner },
+      ];
+
+      // datadog requires point value to be scalar
+      const value = multisigPolicyData.policy;
+      const timestamp = Math.round(new Date().getTime() / 1000);
+      const points = [{ timestamp, value }];
+      return {
+        metric: "backstage.multisigs.policy",
+        type: DATADOG_GAUGE_TYPE,
+        points,
+        resources,
+      };
+    });
+  return series;
+}
+
 function generateSignerMetrics(
   collector: MetricsCollector,
   backstageUrl: string,
