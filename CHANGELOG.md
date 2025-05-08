@@ -1,5 +1,11 @@
 # backstage-blockchain-actions
 
+## 1.0.31
+
+### Patch Changes
+
+- 699d42f: feat: implement multikey report
+
 ## 1.0.30
 
 ### Patch Changes
