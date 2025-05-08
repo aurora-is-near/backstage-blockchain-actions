@@ -72,6 +72,10 @@ export const backstageExport = async ({
           lifecycle,
         }),
         addresses: addressCollector.collectAddresses({ scope, lifecycle }),
+        multiKeyAccounts: addressCollector.collectMultiKeyAccounts({
+          scope,
+          lifecycle,
+        }),
         filteredEntities: JSON.stringify(filteredCollector.entities, null, 2),
         testing,
       };
@@ -123,6 +127,10 @@ function reexportTemplate(
         if (!entity) return "undefined";
         const md = entity.metadata;
         return `${inputs.backstage_url}/catalog/${md.namespace}/${entity.kind}/${md.name}`;
+      },
+      title: (entity: Entity) => {
+        if (!entity || !entity.metadata) return "undefined";
+        return entity.metadata.title || entity.metadata.name || "undefined";
       },
     },
   };

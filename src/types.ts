@@ -70,6 +70,13 @@ export type AddressInfo = OwnedEntity<{
   contracts?: Entity[];
 }>;
 
+export type MultiKeyInfo = {
+  signer: Entity;
+  owner: Entity;
+  keys: Entity[];
+  tags: string[];
+};
+
 type OwnedEntity<T> = {
   [K in keyof T]: T[K];
 } & {

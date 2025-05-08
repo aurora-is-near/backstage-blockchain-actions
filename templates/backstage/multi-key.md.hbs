@@ -1,0 +1,34 @@
+# Accounts with Multiple Keys
+
+{{#each multiKeyAccounts}}
+
+## [{{title signer}}]({{backstageLink signer}})
+{{#if signer.metadata.description}}
+
+{{signer.metadata.description}}
+{{/if}}
+
+{{#if owner}}
+### Owner
+[{{title owner}}]({{backstageLink owner}})
+{{#if owner.metadata.description}}
+
+{{owner.metadata.description}}
+{{/if}}
+{{/if}}
+
+### Keys ({{keys.length}})
+
+{{#each keys}}
+- [{{title this}}]({{backstageLink this}})
+{{/each}}
+
+{{#if signer.metadata.links}}
+
+### External Links
+
+{{#each signer.metadata.links}}
+- [{{this.title}}]({{this.url}})
+{{/each}}
+{{/if}}
+{{/each}} 
